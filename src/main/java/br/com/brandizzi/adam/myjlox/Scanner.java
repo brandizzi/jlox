@@ -151,15 +151,19 @@ class Scanner {
 	}
 
 	private void consumeMultilineComment() {
-		while (peek() != '*' ||  peekNext() != '/') {
+		while ((peek() != '*' ||  peekNext() != '/') && !isAtEnd()) {
 			char character = advance();
 
 			if (character == '\n') {
 				line++;
 			}
 		}
-		advance();
-		advance();
+		if (isAtEnd()) {
+			Lox.error(line, "Multiline comment not closed");
+		} else {
+			advance();
+			advance();
+		}
 	}
 
 	private void consumeLineComment() {

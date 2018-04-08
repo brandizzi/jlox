@@ -1,6 +1,7 @@
 package br.com.brandizzi.adam.myjlox;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.List;
 
@@ -78,5 +79,14 @@ public class ScannerTest {
 
 		assertEquals(TokenType.DOT, token.type);
 		assertEquals(3, token.line);
+	}
+
+	@Test
+	public void testNotClosedMultilineCommentResultsInError() {
+		Scanner scanner = new Scanner("/* this . is ( my comment )");
+
+		scanner.scanTokens();
+
+		assertTrue(Lox.hasError());
 	}
 }
