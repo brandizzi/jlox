@@ -49,7 +49,7 @@ public class ScannerTest {
 
 	@Test
 	public void testMultilineComment() {
-		Scanner scanner = new Scanner("/* this . \n is ( my comment\n ) */");
+		Scanner scanner = new Scanner("/* this . is ( my comment ) */");
 
 		List<Token> tokens = scanner.scanTokens();
 
@@ -58,5 +58,25 @@ public class ScannerTest {
 		Token token = tokens.get(0);
 
 		assertEquals(TokenType.EOF, token.type);
+		assertEquals(1, token.line);
+	}
+
+	@Test
+	public void testMultilineCommentIncrementsLines() {
+		Scanner scanner = new Scanner(". /* this . \n is ( my comment\n ) */ .");
+
+		List<Token> tokens = scanner.scanTokens();
+
+		assertEquals(3, tokens.size());
+
+		Token token = tokens.get(0);
+
+		assertEquals(TokenType.DOT, token.type);
+		assertEquals(1, token.line);
+
+		token = tokens.get(1);
+
+		assertEquals(TokenType.DOT, token.type);
+		assertEquals(3, token.line);
 	}
 }

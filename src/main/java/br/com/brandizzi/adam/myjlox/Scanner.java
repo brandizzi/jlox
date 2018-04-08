@@ -151,8 +151,13 @@ class Scanner {
 	}
 
 	private void consumeMultilineComment() {
-		while (peek() != '*' ||  peekNext() != '/')
-			advance();
+		while (peek() != '*' ||  peekNext() != '/') {
+			char character = advance();
+
+			if (character == '\n') {
+				line++;
+			}
+		}
 		advance();
 		advance();
 	}
