@@ -89,4 +89,18 @@ public class ScannerTest {
 
 		assertTrue(Lox.hasError());
 	}
+
+	@Test
+	public void testMultilineCommentsNested() {
+		Scanner scanner = new Scanner("/* this /* . is ( my */ comment ) */");
+
+		List<Token> tokens = scanner.scanTokens();
+
+		assertEquals(1, tokens.size());
+
+		Token token = tokens.get(0);
+
+		assertEquals(TokenType.EOF, token.type);
+		assertEquals(1, token.line);
+	}
 }

@@ -152,6 +152,11 @@ class Scanner {
 
 	private void consumeMultilineComment() {
 		while ((peek() != '*' ||  peekNext() != '/') && !isAtEnd()) {
+			if ((peek() == '/' &&  peekNext() == '*')) {
+				drop('/');
+				drop('*');
+				consumeMultilineComment();
+			}
 			char character = advance();
 
 			if (character == '\n') {
@@ -161,8 +166,15 @@ class Scanner {
 		if (isAtEnd()) {
 			Lox.error(line, "Multiline comment not closed");
 		} else {
-			advance();
-			advance();
+			drop('*');
+			drop('/');
+		}
+	}
+
+	private void drop(char c) {
+		char character = advance();
+		if (character != c) {
+			Lox.error(line, "Expected character '" + c + "'; got '" + character + "'.");
 		}
 	}
 
