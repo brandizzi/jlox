@@ -119,9 +119,9 @@ class Scanner {
 			break;
 		case '/':
 			if (match('/')) {
-				// A comment goes until the end of the line.
-				while (peek() != '\n' && !isAtEnd())
-					advance();
+				consumeLineComment();
+			} else if (match('*')) {
+				consumeMultilineComment();
 			} else {
 				addToken(SLASH);
 			}
@@ -148,6 +148,18 @@ class Scanner {
 			}
 			break;
 		}
+	}
+
+	private void consumeMultilineComment() {
+		while (peek() != '*' ||  peekNext() != '/')
+			advance();
+		advance();
+		advance();
+	}
+
+	private void consumeLineComment() {
+		while (peek() != '\n' && !isAtEnd())
+			advance();
 	}
 
 	private boolean isAlpha(char c) {
