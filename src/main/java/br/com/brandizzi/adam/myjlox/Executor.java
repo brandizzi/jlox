@@ -45,17 +45,30 @@ class Executor implements Expr.Visitor<Double> {
 	}
 	
 	public static void main(String[] args) {
+//		Expr expression = new Expr.Ternary(
+//			new Expr.Literal(1),
+//			new Expr.Binary(
+//					new Expr.Literal(2),
+//					new Token(TokenType.STAR, "*", null, 1),
+//					new Expr.Grouping(
+//						new Expr.Binary(new Expr.Literal(2.5), new Token(TokenType.PLUS, "+", null, 3), new Expr.Literal(2))
+//					)
+//				),
+//			new Expr.Literal(1)
+//		);
+		
 		Expr expression = new Expr.Ternary(
-			new Expr.Literal(1),
-			new Expr.Binary(
+			new Expr.Literal(0),
+			new Expr.Ternary(
+					new Expr.Literal(0),
 					new Expr.Literal(2),
-					new Token(TokenType.STAR, "*", null, 1),
-					new Expr.Grouping(
-						new Expr.Binary(new Expr.Literal(2.5), new Token(TokenType.PLUS, "+", null, 3), new Expr.Literal(2))
-					)
+					new Expr.Literal(1)
 				),
-			new Expr.Literal(1)
-
+			new Expr.Ternary(
+					new Expr.Literal(0),
+					new Expr.Literal(3),
+					new Expr.Literal(4)
+				)
 		);
 
 		System.out.println(new Executor().calculate(expression));

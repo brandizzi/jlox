@@ -30,7 +30,7 @@ class Parser {
 		if (match(QUESTION)) {
 			Expr middle = expression();
 			consume(TokenType.COLON, "Expect ':' for '?' operator.");
-			Expr last = equality();
+			Expr last = ternary();
 			expr = new Expr.Ternary(expr, middle, last);
 		}
 		return expr;
