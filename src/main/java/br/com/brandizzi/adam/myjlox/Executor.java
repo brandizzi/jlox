@@ -1,5 +1,7 @@
 package br.com.brandizzi.adam.myjlox;
 
+import br.com.brandizzi.adam.myjlox.Expr.Ternary;
+
 class Executor implements Expr.Visitor<Double> {
 	double calculate(Expr expr) {
 		return expr.accept(this);
@@ -43,14 +45,28 @@ class Executor implements Expr.Visitor<Double> {
 	}
 	
 	public static void main(String[] args) {
-		Expr expression = new Expr.Binary(
-				new Expr.Literal(2),
-				new Token(TokenType.STAR, "*", null, 1),
-				new Expr.Grouping(
-					new Expr.Binary(new Expr.Literal(2.5), new Token(TokenType.PLUS, "+", null, 3), new Expr.Literal(2))
-				)
-			);
+		Expr expression = new Expr.Ternary(
+			new Expr.Literal(1),
+			new Expr.Binary(
+					new Expr.Literal(2),
+					new Token(TokenType.STAR, "*", null, 1),
+					new Expr.Grouping(
+						new Expr.Binary(new Expr.Literal(2.5), new Token(TokenType.PLUS, "+", null, 3), new Expr.Literal(2))
+					)
+				),
+			new Expr.Literal(1)
+
+		);
 
 		System.out.println(new Executor().calculate(expression));
+	}
+
+	@Override
+	public Double visitTernary(Ternary ternary) {
+		Double condition = ternary.first.accept(this);
+		if (Math.abs(condition) > 0.0001) {
+			return ternary.middle.accept(this);
+		}
+		return ternary.last.accept(this);
 	}
 }

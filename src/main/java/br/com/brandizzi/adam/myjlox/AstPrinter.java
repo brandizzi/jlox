@@ -1,5 +1,7 @@
 package br.com.brandizzi.adam.myjlox;
 
+import br.com.brandizzi.adam.myjlox.Expr.Ternary;
+
 class AstPrinter implements Expr.Visitor<String> {
 	String print(Expr expr) {
 		return expr.accept(this);
@@ -39,5 +41,10 @@ class AstPrinter implements Expr.Visitor<String> {
 
 	    return builder.toString();
 	  }
+
+	@Override
+	public String visitTernary(Ternary ternary) {
+		return parenthesize("ternary", ternary.first, ternary.middle, ternary.last);
+	}
 
 }

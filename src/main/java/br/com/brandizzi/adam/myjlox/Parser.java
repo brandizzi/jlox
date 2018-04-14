@@ -21,7 +21,29 @@ class Parser {
 	}
 
 	private Expr expression() {
-		return equality();
+		return expressionSeries();
+	}
+
+	private Expr ternary() {
+		Expr expr = equality();
+
+		if (match(QUESTION)) {
+			Expr middle = expression();
+			consume(TokenType.COLON, "Expect ':' for '?' operator.");
+			Expr last = equality();
+			expr = new Expr.Ternary(expr, middle, last);
+		}
+		return expr;
+	}
+
+	private Expr expressionSeries() {
+		Expr expr = ternary();
+		while (match(COMMA)) {
+			Token operator = previous();
+			Expr right = ternary();
+			expr = new Expr.Binary(expr, operator, right);
+		}
+		return expr;
 	}
 
 	private Expr equality() {

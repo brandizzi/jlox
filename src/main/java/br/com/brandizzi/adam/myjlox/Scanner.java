@@ -4,6 +4,7 @@ import static br.com.brandizzi.adam.myjlox.TokenType.AND;
 import static br.com.brandizzi.adam.myjlox.TokenType.BANG;
 import static br.com.brandizzi.adam.myjlox.TokenType.BANG_EQUAL;
 import static br.com.brandizzi.adam.myjlox.TokenType.CLASS;
+import static br.com.brandizzi.adam.myjlox.TokenType.COLON;
 import static br.com.brandizzi.adam.myjlox.TokenType.COMMA;
 import static br.com.brandizzi.adam.myjlox.TokenType.DOT;
 import static br.com.brandizzi.adam.myjlox.TokenType.ELSE;
@@ -27,6 +28,7 @@ import static br.com.brandizzi.adam.myjlox.TokenType.NUMBER;
 import static br.com.brandizzi.adam.myjlox.TokenType.OR;
 import static br.com.brandizzi.adam.myjlox.TokenType.PLUS;
 import static br.com.brandizzi.adam.myjlox.TokenType.PRINT;
+import static br.com.brandizzi.adam.myjlox.TokenType.QUESTION;
 import static br.com.brandizzi.adam.myjlox.TokenType.RETURN;
 import static br.com.brandizzi.adam.myjlox.TokenType.RIGHT_BRACE;
 import static br.com.brandizzi.adam.myjlox.TokenType.RIGHT_PAREN;
@@ -116,6 +118,12 @@ class Scanner {
 			break;
 		case '>':
 			addToken(match('=') ? GREATER_EQUAL : GREATER);
+			break;
+		case '?':
+			addToken(QUESTION);
+			break;
+		case ':':
+			addToken(COLON);
 			break;
 		case '/':
 			if (match('/')) {

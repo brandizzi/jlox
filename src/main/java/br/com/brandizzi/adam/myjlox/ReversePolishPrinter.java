@@ -3,6 +3,7 @@ package br.com.brandizzi.adam.myjlox;
 import br.com.brandizzi.adam.myjlox.Expr.Binary;
 import br.com.brandizzi.adam.myjlox.Expr.Grouping;
 import br.com.brandizzi.adam.myjlox.Expr.Literal;
+import br.com.brandizzi.adam.myjlox.Expr.Ternary;
 import br.com.brandizzi.adam.myjlox.Expr.Unary;
 
 public class ReversePolishPrinter implements Expr.Visitor<String> {
@@ -24,7 +25,6 @@ public class ReversePolishPrinter implements Expr.Visitor<String> {
 
 	@Override
 	public String visitUnaryExpr(Unary expr) {
-		// TODO Auto-generated method stub
 		return expr.right.accept(this) + " " + expr.operator.lexeme;
 	}
 
@@ -42,6 +42,11 @@ public class ReversePolishPrinter implements Expr.Visitor<String> {
 			);
 
 		System.out.println(new ReversePolishPrinter().print(expression));
+	}
+
+	@Override
+	public String visitTernary(Ternary ternary) {
+		throw new ParseError();
 	}
 
 }
