@@ -25,6 +25,10 @@ class Parser {
 	}
 
 	private Expr ternary() {
+		if (match(QUESTION)) {
+			error(previous(), "Question operator ('?') expects an expression at the left.");
+			return equality();
+		}
 		Expr expr = equality();
 
 		if (match(QUESTION)) {
@@ -37,6 +41,11 @@ class Parser {
 	}
 
 	private Expr expressionSeries() {
+		if (match(COMMA)) {
+			error(previous(), "Comma operator (',') expects an expression at the left.");
+			return ternary();
+		}
+
 		Expr expr = ternary();
 		while (match(COMMA)) {
 			Token operator = previous();
@@ -47,6 +56,11 @@ class Parser {
 	}
 
 	private Expr equality() {
+		if (match(BANG_EQUAL, EQUAL_EQUAL)) {
+			error(previous(), "Equality/inequality comparison expects an expression at the left.");
+			return comparison();
+
+		}
 		Expr expr = comparison();
 
 		while (match(BANG_EQUAL, EQUAL_EQUAL)) {
@@ -59,6 +73,11 @@ class Parser {
 	}
 
 	private Expr comparison() {
+		if (match(LESS, LESS_EQUAL, GREATER, GREATER_EQUAL)) {
+			error(previous(), "Ordered comparisons expect an expression at the left.");
+			return addition();
+
+		}
 		Expr expr = addition();
 
 		while (match(LESS, LESS_EQUAL, GREATER, GREATER_EQUAL)) {
@@ -71,6 +90,10 @@ class Parser {
 	}
 
 	private Expr addition() {
+		if (match( PLUS)) {
+			error(previous(), "Addition and expects an expression at the left.\n");
+			return multiplication();
+		}
 		Expr expr = multiplication();
 
 		while (match(MINUS, PLUS)) {
@@ -83,6 +106,9 @@ class Parser {
 	}
 
 	private Expr multiplication() {
+		if (match(STAR, SLASH)) {
+			error(previous(), "Multiplication and division expect an expression at the left.");
+		}
 		Expr expr = unary();
 
 		while (match(STAR, SLASH)) {

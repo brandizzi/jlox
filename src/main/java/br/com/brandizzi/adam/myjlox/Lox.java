@@ -61,8 +61,9 @@ public class Lox {
 	    Expr expression = parser.parse();
 
 	    // Stop if there was a syntax error.
-	    if (hadError) return;
+	    //if (hadError) return;
 
+	    if (expression == null) return;
 	    System.out.println(new AstPrinter().print(expression));
 	}
 
