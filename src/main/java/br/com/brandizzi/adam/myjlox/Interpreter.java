@@ -86,6 +86,7 @@ public class Interpreter implements Visitor<Object> {
 			return (double) left * (double) right;
 		case SLASH:
 			checkNumberOperands(expr.operator, left, right);
+			checkDivisionByZero(expr.operator, (double) right);
 			return (double) left / (double) right;
 		case GREATER:
 			checkNumberOperands(expr.operator, left, right);
@@ -110,6 +111,12 @@ public class Interpreter implements Visitor<Object> {
 		}
 	}
 
+	private void checkDivisionByZero(Token operator, double right) {
+		if (right == 0) {
+			throw new RuntimeError(operator, "Divisor cannot be zero.");
+		}
+	}
+
 	private void checkNumberOperands(Token token, Object left, Object right) {
 		if (left instanceof Double && right instanceof Double)
 			return;
@@ -122,6 +129,7 @@ public class Interpreter implements Visitor<Object> {
 		if (a == null && b == null)
 			return true;
 		if (a == null)
+
 			return false;
 
 		return a.equals(b);
