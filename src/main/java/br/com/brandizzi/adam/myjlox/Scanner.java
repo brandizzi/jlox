@@ -159,8 +159,8 @@ class Scanner {
 	}
 
 	private void consumeMultilineComment() {
-		while ((peek() != '*' ||  peekNext() != '/') && !isAtEnd()) {
-			if ((peek() == '/' &&  peekNext() == '*')) {
+		while ((peek() != '*' || peekNext() != '/') && !isAtEnd()) {
+			if ((peek() == '/' && peekNext() == '*')) {
 				drop('/');
 				drop('*');
 				consumeMultilineComment();

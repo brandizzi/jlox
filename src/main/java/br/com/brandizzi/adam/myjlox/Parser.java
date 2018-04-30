@@ -1,8 +1,30 @@
 package br.com.brandizzi.adam.myjlox;
 
-import java.util.List;
-
 import static br.com.brandizzi.adam.myjlox.TokenType.*;
+import static br.com.brandizzi.adam.myjlox.TokenType.BANG_EQUAL;
+import static br.com.brandizzi.adam.myjlox.TokenType.COMMA;
+import static br.com.brandizzi.adam.myjlox.TokenType.EOF;
+import static br.com.brandizzi.adam.myjlox.TokenType.EQUAL_EQUAL;
+import static br.com.brandizzi.adam.myjlox.TokenType.FALSE;
+import static br.com.brandizzi.adam.myjlox.TokenType.GREATER;
+import static br.com.brandizzi.adam.myjlox.TokenType.GREATER_EQUAL;
+import static br.com.brandizzi.adam.myjlox.TokenType.LEFT_PAREN;
+import static br.com.brandizzi.adam.myjlox.TokenType.LESS;
+import static br.com.brandizzi.adam.myjlox.TokenType.LESS_EQUAL;
+import static br.com.brandizzi.adam.myjlox.TokenType.MINUS;
+import static br.com.brandizzi.adam.myjlox.TokenType.NIL;
+import static br.com.brandizzi.adam.myjlox.TokenType.NUMBER;
+import static br.com.brandizzi.adam.myjlox.TokenType.PLUS;
+import static br.com.brandizzi.adam.myjlox.TokenType.QUESTION;
+import static br.com.brandizzi.adam.myjlox.TokenType.RIGHT_PAREN;
+import static br.com.brandizzi.adam.myjlox.TokenType.SEMICOLON;
+import static br.com.brandizzi.adam.myjlox.TokenType.SLASH;
+import static br.com.brandizzi.adam.myjlox.TokenType.STAR;
+import static br.com.brandizzi.adam.myjlox.TokenType.STRING;
+import static br.com.brandizzi.adam.myjlox.TokenType.TRUE;
+
+import java.util.ArrayList;
+import java.util.List;
 
 class Parser {
 	private final List<Token> tokens;
@@ -12,16 +34,95 @@ class Parser {
 		this.tokens = tokens;
 	}
 
-	Expr parse() {
+	List<Stmt> parse() {
+		List<Stmt> statements = new ArrayList<>();
+		while (!isAtEnd()) {
+			statements.add(declaration());
+		}
+
+		return statements;
+	}
+
+	Expr parseExpression() {
+		return expression();
+	}
+
+	private Stmt declaration() {
 		try {
-			return expression();
+			if (match(TokenType.VAR))
+				return varDeclaration();
+
+			return statement();
 		} catch (ParseError error) {
+			synchronize();
 			return null;
 		}
 	}
 
+	private Stmt varDeclaration() {
+		Token name = consume(TokenType.IDENTIFIER, "Expect variable name.");
+
+		Expr initializer = null;
+		if (match(TokenType.EQUAL)) {
+			initializer = expression();
+		}
+
+		consume(SEMICOLON, "Expect ';' after variable declaration.");
+		return new Stmt.Var(name, initializer);
+	}
+
+	private Stmt statement() {
+		if (match(TokenType.PRINT))
+			return printStatement();
+		if (match(LEFT_BRACE))
+			return new Stmt.Block(block());
+
+		return expressionStatement();
+	}
+
+	private List<Stmt> block() {
+		List<Stmt> statements = new ArrayList<>();
+
+		while (!check(RIGHT_BRACE) && !isAtEnd()) {
+			statements.add(declaration());
+		}
+
+		consume(RIGHT_BRACE, "Expect '}' after block.");
+		return statements;
+	}
+
+	private Stmt printStatement() {
+		Expr value = expression();
+		consume(SEMICOLON, "Expect ';' after value.");
+		return new Stmt.Print(value);
+	}
+
+	private Stmt expressionStatement() {
+		Expr expr = expression();
+		consume(SEMICOLON, "Expect ';' after expression.");
+		return new Stmt.Expression(expr);
+	}
+
 	private Expr expression() {
-		return expressionSeries();
+		return assignment();
+	}
+
+	private Expr assignment() {
+		Expr expr = equality();
+
+		if (match(TokenType.EQUAL)) {
+			Token equals = previous();
+			Expr value = assignment();
+
+			if (expr instanceof Expr.Variable) {
+				Token name = ((Expr.Variable) expr).name;
+				return new Expr.Assign(name, value);
+			}
+
+			error(equals, "Invalid assignment target.");
+		}
+
+		return expr;
 	}
 
 	private Expr ternary() {
@@ -90,7 +191,7 @@ class Parser {
 	}
 
 	private Expr addition() {
-		if (match( PLUS)) {
+		if (match(PLUS)) {
 			error(previous(), "Addition and expects an expression at the left.\n");
 			return multiplication();
 		}
@@ -140,6 +241,10 @@ class Parser {
 
 		if (match(NUMBER, STRING)) {
 			return new Expr.Literal(previous().literal);
+		}
+
+		if (match(TokenType.IDENTIFIER)) {
+			return new Expr.Variable(previous());
 		}
 
 		if (match(LEFT_PAREN)) {

@@ -1,6 +1,8 @@
 package br.com.brandizzi.adam.myjlox;
 
+import br.com.brandizzi.adam.myjlox.Expr.Assign;
 import br.com.brandizzi.adam.myjlox.Expr.Ternary;
+import br.com.brandizzi.adam.myjlox.Expr.Variable;
 
 class AstPrinter implements Expr.Visitor<String> {
 	String print(Expr expr) {
@@ -28,23 +30,33 @@ class AstPrinter implements Expr.Visitor<String> {
 	public String visitUnaryExpr(Expr.Unary expr) {
 		return parenthesize(expr.operator.lexeme, expr.right);
 	}
-	
+
 	private String parenthesize(String name, Expr... exprs) {
-	    StringBuilder builder = new StringBuilder();
+		StringBuilder builder = new StringBuilder();
 
-	    builder.append("(").append(name);
-	    for (Expr expr : exprs) {
-	      builder.append(" ");
-	      builder.append(expr.accept(this));
-	    }
-	    builder.append(")");
+		builder.append("(").append(name);
+		for (Expr expr : exprs) {
+			builder.append(" ");
+			builder.append(expr.accept(this));
+		}
+		builder.append(")");
 
-	    return builder.toString();
-	  }
+		return builder.toString();
+	}
 
 	@Override
-	public String visitTernary(Ternary ternary) {
+	public String visitTernaryExpr(Ternary ternary) {
 		return parenthesize("ternary", ternary.first, ternary.middle, ternary.last);
+	}
+
+	@Override
+	public String visitAssignExpr(Assign expr) {
+		return "(\u21e6" + expr.name.lexeme + expr.accept(this);
+	}
+
+	@Override
+	public String visitVariableExpr(Variable expr) {
+		return "(var" + expr.name + ")";
 	}
 
 }

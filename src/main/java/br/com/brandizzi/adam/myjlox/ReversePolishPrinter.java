@@ -1,10 +1,12 @@
 package br.com.brandizzi.adam.myjlox;
 
+import br.com.brandizzi.adam.myjlox.Expr.Assign;
 import br.com.brandizzi.adam.myjlox.Expr.Binary;
 import br.com.brandizzi.adam.myjlox.Expr.Grouping;
 import br.com.brandizzi.adam.myjlox.Expr.Literal;
 import br.com.brandizzi.adam.myjlox.Expr.Ternary;
 import br.com.brandizzi.adam.myjlox.Expr.Unary;
+import br.com.brandizzi.adam.myjlox.Expr.Variable;
 
 public class ReversePolishPrinter implements Expr.Visitor<String> {
 
@@ -31,22 +33,30 @@ public class ReversePolishPrinter implements Expr.Visitor<String> {
 	public String print(Expr expr) {
 		return expr.accept(this);
 	}
-	
+
 	public static void main(String[] args) {
-		Expr expression = new Expr.Binary(
-				new Expr.Literal(123),
-				new Token(TokenType.STAR, "*", null, 1),
-				new Expr.Grouping(
-					new Expr.Binary(new Expr.Literal(45.67), new Token(TokenType.PLUS, "+", null, 1), new Expr.Literal(0.33))
-				)
-			);
+		Expr expression = new Expr.Binary(new Expr.Literal(123), new Token(TokenType.STAR, "*", null, 1),
+				new Expr.Grouping(new Expr.Binary(new Expr.Literal(45.67), new Token(TokenType.PLUS, "+", null, 1),
+						new Expr.Literal(0.33))));
 
 		System.out.println(new ReversePolishPrinter().print(expression));
 	}
 
 	@Override
-	public String visitTernary(Ternary ternary) {
+	public String visitTernaryExpr(Ternary ternary) {
 		throw new ParseError();
+	}
+
+	@Override
+	public String visitAssignExpr(Assign expr) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitVariableExpr(Variable expr) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

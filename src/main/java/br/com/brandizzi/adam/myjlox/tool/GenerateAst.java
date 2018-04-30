@@ -12,15 +12,20 @@ public class GenerateAst {
 			System.exit(1);
 		}
 		String outputDir = args[0];
-		defineAst(outputDir, "Expr", Arrays.asList("Binary   : Expr left, Token operator, Expr right",
-				"Grouping : Expr expression", "Literal  : Object value", "Unary    : Token operator, Expr right"));
+		defineAst(outputDir, "Expr",
+				Arrays.asList("Ternary : Expr first, Expr middle, Expr last", "Assign   : Token name, Expr value",
+						"Binary   : Expr left, Token operator, Expr right", "Grouping : Expr expression",
+						"Literal  : Object value", "Unary    : Token operator, Expr right", "Variable : Token name"));
+
+		defineAst(outputDir, "Stmt", Arrays.asList("Expression : Expr expression", "Print : Expr expression",
+				"Block      : List<Stmt> statements", "Var : Token name, Expr initializer"));
 	}
 
 	private static void defineAst(String outputDir, String baseName, List<String> types) throws IOException {
 		String path = outputDir + "/" + baseName + ".java";
 		PrintWriter writer = new PrintWriter(path, "UTF-8");
 
-		writer.println("package com.craftinginterpreters.lox;");
+		writer.println("package br.com.brandizzi.adam.myjlox;");
 		writer.println("");
 		writer.println("import java.util.List;");
 		writer.println("");
@@ -62,11 +67,10 @@ public class GenerateAst {
 		}
 
 		writer.println("    }");
-	    writer.println();
-	    writer.println("    <R> R accept(Visitor<R> visitor) {");
-	    writer.println("      return visitor.visit" +
-	        className + baseName + "(this);");
-	    writer.println("    }");																																																																																										
+		writer.println();
+		writer.println("    <R> R accept(Visitor<R> visitor) {");
+		writer.println("      return visitor.visit" + className + baseName + "(this);");
+		writer.println("    }");
 		// Fields.
 		writer.println();
 		for (String field : fields) {
