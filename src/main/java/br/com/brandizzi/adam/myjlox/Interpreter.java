@@ -10,6 +10,7 @@ import br.com.brandizzi.adam.myjlox.Expr.Unary;
 import br.com.brandizzi.adam.myjlox.Expr.Variable;
 
 public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
+	Object uninitializedValue = new Object();
 
 	private Environment environment = new Environment();
 	String lastExpressionValue;
@@ -24,17 +25,13 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
 		}
 	}
 
-	String interpret(Expr expression) {
-		return stringify(evaluate(expression));
-	}
-
 	private void execute(Stmt stmt) {
 		stmt.accept(this);
 	}
 
 	@Override
 	public Void visitVarStmt(Stmt.Var stmt) {
-		Object value = null;
+		Object value = uninitializedValue;
 		if (stmt.initializer != null) {
 			value = evaluate(stmt.initializer);
 		}
@@ -200,7 +197,13 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
 
 	@Override
 	public Object visitVariableExpr(Variable expr) {
-		return environment.get(expr.name);
+		Object value = environment.get(expr.name);
+
+		if (value == uninitializedValue) {
+			throw new RuntimeError(expr.name, "Variable " + expr.name.lexeme + " used before initialization.");
+		}
+
+		return value;
 	}
 
 	@Override

@@ -11,8 +11,8 @@ import java.util.Optional;
 
 public class Lox {
 	private static final Interpreter interpreter = new Interpreter();
-	private static boolean hadError;
-	private static boolean hadRuntimeError;
+	static boolean hadError;
+	static boolean hadRuntimeError;
 
 	public static void main(String[] args) throws IOException {
 		if (args.length > 1) {

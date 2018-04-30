@@ -43,10 +43,6 @@ class Parser {
 		return statements;
 	}
 
-	Expr parseExpression() {
-		return expression();
-	}
-
 	private Stmt declaration() {
 		try {
 			if (match(TokenType.VAR))
