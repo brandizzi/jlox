@@ -44,7 +44,20 @@ public class Lox {
 
 		for (;;) {
 			System.out.print("> ");
-			run(reader.readLine());
+			String line = reader.readLine();
+			if (line == null)
+				break;
+
+			String trimmedLine = line.trim();
+
+			if (trimmedLine.isEmpty())
+				continue;
+
+			if (!trimmedLine.endsWith(";")) {
+				line += ";";
+			}
+
+			run(line);
 			hadError = false;
 		}
 	}
@@ -62,14 +75,21 @@ public class Lox {
 		List<Token> tokens = scanner.scanTokens();
 
 		Parser parser = new Parser(tokens);
-		Expr expression = parser.parse();
+		List<Stmt> statements = parser.parse();
 
 		// Stop if there was a syntax error.
-		// if (hadError) return;
-
-		if (expression == null)
+		if (hadError)
 			return;
-		interpreter.interpret(expression);
+
+		if (statements == null)
+			return;
+		Stmt lastStatement = statements.get(statements.size() - 1);
+
+		interpreter.interpret(statements);
+
+		if (lastStatement instanceof Stmt.Expression) {
+			System.out.println(interpreter.lastExpressionValue);
+		}
 	}
 
 	public static void error(int line, String message) {
