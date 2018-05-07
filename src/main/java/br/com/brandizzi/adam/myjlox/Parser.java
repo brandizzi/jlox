@@ -1,29 +1,39 @@
 package br.com.brandizzi.adam.myjlox;
 
-import static br.com.brandizzi.adam.myjlox.TokenType.*;
+import static br.com.brandizzi.adam.myjlox.TokenType.AND;
+import static br.com.brandizzi.adam.myjlox.TokenType.BANG;
 import static br.com.brandizzi.adam.myjlox.TokenType.BANG_EQUAL;
 import static br.com.brandizzi.adam.myjlox.TokenType.COMMA;
+import static br.com.brandizzi.adam.myjlox.TokenType.ELSE;
 import static br.com.brandizzi.adam.myjlox.TokenType.EOF;
 import static br.com.brandizzi.adam.myjlox.TokenType.EQUAL_EQUAL;
 import static br.com.brandizzi.adam.myjlox.TokenType.FALSE;
+import static br.com.brandizzi.adam.myjlox.TokenType.FOR;
 import static br.com.brandizzi.adam.myjlox.TokenType.GREATER;
 import static br.com.brandizzi.adam.myjlox.TokenType.GREATER_EQUAL;
+import static br.com.brandizzi.adam.myjlox.TokenType.IF;
+import static br.com.brandizzi.adam.myjlox.TokenType.LEFT_BRACE;
 import static br.com.brandizzi.adam.myjlox.TokenType.LEFT_PAREN;
 import static br.com.brandizzi.adam.myjlox.TokenType.LESS;
 import static br.com.brandizzi.adam.myjlox.TokenType.LESS_EQUAL;
 import static br.com.brandizzi.adam.myjlox.TokenType.MINUS;
 import static br.com.brandizzi.adam.myjlox.TokenType.NIL;
 import static br.com.brandizzi.adam.myjlox.TokenType.NUMBER;
+import static br.com.brandizzi.adam.myjlox.TokenType.OR;
 import static br.com.brandizzi.adam.myjlox.TokenType.PLUS;
 import static br.com.brandizzi.adam.myjlox.TokenType.QUESTION;
+import static br.com.brandizzi.adam.myjlox.TokenType.RIGHT_BRACE;
 import static br.com.brandizzi.adam.myjlox.TokenType.RIGHT_PAREN;
 import static br.com.brandizzi.adam.myjlox.TokenType.SEMICOLON;
 import static br.com.brandizzi.adam.myjlox.TokenType.SLASH;
 import static br.com.brandizzi.adam.myjlox.TokenType.STAR;
 import static br.com.brandizzi.adam.myjlox.TokenType.STRING;
 import static br.com.brandizzi.adam.myjlox.TokenType.TRUE;
+import static br.com.brandizzi.adam.myjlox.TokenType.VAR;
+import static br.com.brandizzi.adam.myjlox.TokenType.WHILE;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 class Parser {
@@ -72,8 +82,77 @@ class Parser {
 			return printStatement();
 		if (match(LEFT_BRACE))
 			return new Stmt.Block(block());
+		if (match(IF))
+			return ifStatement();
+		if (match(WHILE))
+			return whileStatement();
+		if (match(FOR))
+			return forStatement();
 
 		return expressionStatement();
+	}
+
+	private Stmt forStatement() {
+		consume(LEFT_PAREN, "Expect '(' after 'for'.");
+
+		Stmt initializer;
+		if (match(SEMICOLON)) {
+			initializer = null;
+		} else if (match(VAR)) {
+			initializer = varDeclaration();
+		} else {
+			initializer = expressionStatement();
+		}
+
+		Expr condition = null;
+		if (!check(SEMICOLON)) {
+			condition = expression();
+		}
+		consume(SEMICOLON, "Expect ';' after loop condition.");
+
+		Expr increment = null;
+		if (!check(RIGHT_PAREN)) {
+			increment = expression();
+		}
+		consume(RIGHT_PAREN, "Expect ')' after for clauses.");
+
+		Stmt body = statement();
+
+		if (increment != null) {
+			body = new Stmt.Block(Arrays.asList(body, new Stmt.Expression(increment)));
+		}
+		if (condition == null)
+			condition = new Expr.Literal(true);
+		body = new Stmt.While(condition, body);
+
+		if (initializer != null) {
+			body = new Stmt.Block(Arrays.asList(initializer, body));
+		}
+
+		return body;
+	}
+
+	private Stmt whileStatement() {
+		consume(LEFT_PAREN, "Expect '(' after 'while'.");
+		Expr condition = expression();
+		consume(RIGHT_PAREN, "Expect ')' after condition.");
+		Stmt body = statement();
+
+		return new Stmt.While(condition, body);
+	}
+
+	private Stmt ifStatement() {
+		consume(LEFT_PAREN, "Expect '(' after 'if'.");
+		Expr condition = expression();
+		consume(RIGHT_PAREN, "Expect ')' after if condition.");
+
+		Stmt thenBranch = statement();
+		Stmt elseBranch = null;
+		if (match(ELSE)) {
+			elseBranch = statement();
+		}
+
+		return new Stmt.If(condition, thenBranch, elseBranch);
 	}
 
 	private List<Stmt> block() {
@@ -104,7 +183,7 @@ class Parser {
 	}
 
 	private Expr assignment() {
-		Expr expr = equality();
+		Expr expr = or();
 
 		if (match(TokenType.EQUAL)) {
 			Token equals = previous();
@@ -116,6 +195,30 @@ class Parser {
 			}
 
 			error(equals, "Invalid assignment target.");
+		}
+
+		return expr;
+	}
+
+	private Expr or() {
+		Expr expr = and();
+
+		while (match(OR)) {
+			Token operator = previous();
+			Expr right = and();
+			expr = new Expr.Logical(expr, operator, right);
+		}
+
+		return expr;
+	}
+
+	private Expr and() {
+		Expr expr = equality();
+
+		while (match(AND)) {
+			Token operator = previous();
+			Expr right = equality();
+			expr = new Expr.Logical(expr, operator, right);
 		}
 
 		return expr;

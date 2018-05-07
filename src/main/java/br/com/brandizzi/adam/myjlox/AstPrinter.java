@@ -1,6 +1,7 @@
 package br.com.brandizzi.adam.myjlox;
 
 import br.com.brandizzi.adam.myjlox.Expr.Assign;
+import br.com.brandizzi.adam.myjlox.Expr.Logical;
 import br.com.brandizzi.adam.myjlox.Expr.Ternary;
 import br.com.brandizzi.adam.myjlox.Expr.Variable;
 
@@ -57,6 +58,12 @@ class AstPrinter implements Expr.Visitor<String> {
 	@Override
 	public String visitVariableExpr(Variable expr) {
 		return "(var" + expr.name + ")";
+	}
+
+	@Override
+	public String visitLogicalExpr(Logical expr) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }
