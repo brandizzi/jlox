@@ -15,6 +15,8 @@ abstract class Stmt {
 		R visitIfStmt(If stmt);
 
 		R visitWhileStmt(While stmt);
+
+		R visitBreakStmt(Break stmt);
 	}
 
 	static class Expression extends Stmt {
@@ -95,6 +97,18 @@ abstract class Stmt {
 
 		final Expr condition;
 		final Stmt body;
+	}
+
+	static class Break extends Stmt {
+		Break(Token command) {
+			this.command = command;
+		}
+
+		<R> R accept(Visitor<R> visitor) {
+			return visitor.visitBreakStmt(this);
+		}
+
+		final Token command;
 	}
 
 	abstract <R> R accept(Visitor<R> visitor);
