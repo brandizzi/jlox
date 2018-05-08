@@ -8,12 +8,15 @@ import br.com.brandizzi.adam.myjlox.Expr.Literal;
 import br.com.brandizzi.adam.myjlox.Expr.Ternary;
 import br.com.brandizzi.adam.myjlox.Expr.Unary;
 import br.com.brandizzi.adam.myjlox.Expr.Variable;
+import br.com.brandizzi.adam.myjlox.Stmt.Break;
 
 public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
 	Object uninitializedValue = new Object();
 
 	private Environment environment = new Environment();
 	String lastExpressionValue;
+
+	private boolean breakLoop = false;
 
 	void interpret(List<Stmt> stmts) {
 		try {
@@ -226,6 +229,8 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
 			this.environment = environment;
 
 			for (Stmt statement : statements) {
+				if (breakLoop)
+					break;
 				execute(statement);
 			}
 		} finally {
@@ -245,9 +250,10 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
 
 	@Override
 	public Void visitWhileStmt(Stmt.While stmt) {
-		while (isTruthy(evaluate(stmt.condition))) {
+		while (!breakLoop && isTruthy(evaluate(stmt.condition))) {
 			execute(stmt.body);
 		}
+		breakLoop = false;
 		return null;
 	}
 
@@ -264,5 +270,11 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
 		}
 
 		return evaluate(expr.right);
+	}
+
+	@Override
+	public Void visitBreakStmt(Break stmt) {
+		breakLoop = true;
+		return null;
 	}
 }
