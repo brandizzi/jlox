@@ -3,6 +3,7 @@ package br.com.brandizzi.adam.myjlox;
 import static br.com.brandizzi.adam.myjlox.TokenType.AND;
 import static br.com.brandizzi.adam.myjlox.TokenType.BANG;
 import static br.com.brandizzi.adam.myjlox.TokenType.BANG_EQUAL;
+import static br.com.brandizzi.adam.myjlox.TokenType.BREAK;
 import static br.com.brandizzi.adam.myjlox.TokenType.COMMA;
 import static br.com.brandizzi.adam.myjlox.TokenType.ELSE;
 import static br.com.brandizzi.adam.myjlox.TokenType.EOF;
@@ -39,6 +40,7 @@ import java.util.List;
 class Parser {
 	private final List<Token> tokens;
 	private int current = 0;
+	private boolean inLoop = false;
 
 	Parser(List<Token> tokens) {
 		this.tokens = tokens;
@@ -88,8 +90,19 @@ class Parser {
 			return whileStatement();
 		if (match(FOR))
 			return forStatement();
+		if (match(BREAK))
+			return breakStatement();
 
 		return expressionStatement();
+	}
+
+	private Stmt breakStatement() {
+		if (!inLoop) {
+			error(previous(), "'break' outside loop.");
+		}
+		Token token = consume(TokenType.SEMICOLON, "Expect ';' after 'break'.");
+
+		return new Stmt.Break(token);
 	}
 
 	private Stmt forStatement() {
@@ -116,6 +129,7 @@ class Parser {
 		}
 		consume(RIGHT_PAREN, "Expect ')' after for clauses.");
 
+		inLoop = true;
 		Stmt body = statement();
 
 		if (increment != null) {
@@ -128,15 +142,18 @@ class Parser {
 		if (initializer != null) {
 			body = new Stmt.Block(Arrays.asList(initializer, body));
 		}
+		inLoop = false;
 
 		return body;
 	}
 
 	private Stmt whileStatement() {
+		inLoop = true;
 		consume(LEFT_PAREN, "Expect '(' after 'while'.");
 		Expr condition = expression();
 		consume(RIGHT_PAREN, "Expect ')' after condition.");
 		Stmt body = statement();
+		inLoop = false;
 
 		return new Stmt.While(condition, body);
 	}
