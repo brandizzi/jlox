@@ -3,6 +3,7 @@ package br.com.brandizzi.adam.myjlox;
 import static br.com.brandizzi.adam.myjlox.TokenType.AND;
 import static br.com.brandizzi.adam.myjlox.TokenType.BANG;
 import static br.com.brandizzi.adam.myjlox.TokenType.BANG_EQUAL;
+import static br.com.brandizzi.adam.myjlox.TokenType.BREAK;
 import static br.com.brandizzi.adam.myjlox.TokenType.CLASS;
 import static br.com.brandizzi.adam.myjlox.TokenType.COLON;
 import static br.com.brandizzi.adam.myjlox.TokenType.COMMA;
@@ -289,6 +290,7 @@ class Scanner {
 	static {
 		keywords = new HashMap<>();
 		keywords.put("and", AND);
+		keywords.put("break", BREAK);
 		keywords.put("class", CLASS);
 		keywords.put("else", ELSE);
 		keywords.put("false", FALSE);
