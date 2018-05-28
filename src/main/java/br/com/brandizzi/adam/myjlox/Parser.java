@@ -235,7 +235,28 @@ class Parser {
     }
 
     private Expr expression() {
+        if (match(FUN))
+            return functionExpression();
         return assignment();
+    }
+
+    private Expr functionExpression() {
+        consume(LEFT_PAREN, "Expect '(' after function name.");
+        List<Token> parameters = new ArrayList<>();
+        if (!check(RIGHT_PAREN)) {
+            do {
+                if (parameters.size() >= 8) {
+                    error(peek(), "Cannot have more than 8 parameters.");
+                }
+
+                parameters.add(consume(IDENTIFIER, "Expect parameter name."));
+            } while (match(COMMA));
+        }
+        consume(RIGHT_PAREN, "Expect ')' after parameters.");
+
+        consume(LEFT_BRACE, "Expect '{' before function body.");
+        List<Stmt> body = block();
+        return new Expr.Function(parameters, body);
     }
 
     private Expr assignment() {

@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import br.com.brandizzi.adam.myjlox.Expr.Binary;
+import br.com.brandizzi.adam.myjlox.Expr.Function;
 import br.com.brandizzi.adam.myjlox.Expr.Grouping;
 import br.com.brandizzi.adam.myjlox.Expr.Literal;
 import br.com.brandizzi.adam.myjlox.Expr.Ternary;
@@ -342,5 +343,10 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
             value = evaluate(stmt.value);
 
         throw new br.com.brandizzi.adam.myjlox.Return(value);
+    }
+
+    @Override
+    public Object visitFunctionExpr(Function expr) {
+        return new LoxFunction(expr, environment);
     }
 }
