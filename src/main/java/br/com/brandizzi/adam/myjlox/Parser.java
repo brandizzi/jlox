@@ -60,8 +60,13 @@ class Parser {
 
     private Stmt declaration() {
         try {
-            if (match(FUN))
-                return function("function");
+            if (match(FUN)) {
+                if (check(LEFT_PAREN)) {
+                    rewind();
+                } else {
+                    return function("function");
+                }
+            }
             if (match(TokenType.VAR))
                 return varDeclaration();
 
@@ -70,6 +75,10 @@ class Parser {
             synchronize();
             return null;
         }
+    }
+
+    private void rewind() {
+        current--;
     }
 
     private Stmt.Function function(String kind) {
@@ -235,8 +244,6 @@ class Parser {
     }
 
     private Expr expression() {
-        if (match(FUN))
-            return functionExpression();
         return assignment();
     }
 
@@ -455,6 +462,8 @@ class Parser {
     }
 
     private Expr primary() {
+        if (match(FUN))
+            return functionExpression();
         if (match(FALSE))
             return new Expr.Literal(false);
         if (match(TRUE))
