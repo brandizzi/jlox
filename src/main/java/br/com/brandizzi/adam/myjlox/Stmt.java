@@ -3,113 +3,147 @@ package br.com.brandizzi.adam.myjlox;
 import java.util.List;
 
 abstract class Stmt {
-	interface Visitor<R> {
-		R visitExpressionStmt(Expression stmt);
+    interface Visitor<R> {
+        R visitExpressionStmt(Expression stmt);
 
-		R visitPrintStmt(Print stmt);
+        R visitPrintStmt(Print stmt);
 
-		R visitBlockStmt(Block stmt);
+        R visitBlockStmt(Block stmt);
 
-		R visitVarStmt(Var stmt);
+        R visitReturnStmt(Return stmt);
 
-		R visitIfStmt(If stmt);
+        R visitFunctionStmt(Function stmt);
 
-		R visitWhileStmt(While stmt);
+        R visitVarStmt(Var stmt);
 
-		R visitBreakStmt(Break stmt);
-	}
+        R visitIfStmt(If stmt);
 
-	static class Expression extends Stmt {
-		Expression(Expr expression) {
-			this.expression = expression;
-		}
+        R visitWhileStmt(While stmt);
 
-		<R> R accept(Visitor<R> visitor) {
-			return visitor.visitExpressionStmt(this);
-		}
+        R visitBreakStmt(Break stmt);
+    }
 
-		final Expr expression;
-	}
+    static class Expression extends Stmt {
+        Expression(Expr expression) {
+            this.expression = expression;
+        }
 
-	static class Print extends Stmt {
-		Print(Expr expression) {
-			this.expression = expression;
-		}
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitExpressionStmt(this);
+        }
 
-		<R> R accept(Visitor<R> visitor) {
-			return visitor.visitPrintStmt(this);
-		}
+        final Expr expression;
+    }
 
-		final Expr expression;
-	}
+    static class Print extends Stmt {
+        Print(Expr expression) {
+            this.expression = expression;
+        }
 
-	static class Block extends Stmt {
-		Block(List<Stmt> statements) {
-			this.statements = statements;
-		}
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitPrintStmt(this);
+        }
 
-		<R> R accept(Visitor<R> visitor) {
-			return visitor.visitBlockStmt(this);
-		}
+        final Expr expression;
+    }
 
-		final List<Stmt> statements;
-	}
+    static class Block extends Stmt {
+        Block(List<Stmt> statements) {
+            this.statements = statements;
+        }
 
-	static class Var extends Stmt {
-		Var(Token name, Expr initializer) {
-			this.name = name;
-			this.initializer = initializer;
-		}
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitBlockStmt(this);
+        }
 
-		<R> R accept(Visitor<R> visitor) {
-			return visitor.visitVarStmt(this);
-		}
+        final List<Stmt> statements;
+    }
 
-		final Token name;
-		final Expr initializer;
-	}
+    static class Return extends Stmt {
+        Return(Token keyword, Expr value) {
+            this.keyword = keyword;
+            this.value = value;
+        }
 
-	static class If extends Stmt {
-		If(Expr condition, Stmt thenBranch, Stmt elseBranch) {
-			this.condition = condition;
-			this.thenBranch = thenBranch;
-			this.elseBranch = elseBranch;
-		}
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitReturnStmt(this);
+        }
 
-		<R> R accept(Visitor<R> visitor) {
-			return visitor.visitIfStmt(this);
-		}
+        final Token keyword;
+        final Expr value;
+    }
 
-		final Expr condition;
-		final Stmt thenBranch;
-		final Stmt elseBranch;
-	}
+    static class Function extends Stmt {
+        Function(Token name, List<Token> parameters, List<Stmt> body) {
+            this.name = name;
+            this.parameters = parameters;
+            this.body = body;
+        }
 
-	static class While extends Stmt {
-		While(Expr condition, Stmt body) {
-			this.condition = condition;
-			this.body = body;
-		}
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitFunctionStmt(this);
+        }
 
-		<R> R accept(Visitor<R> visitor) {
-			return visitor.visitWhileStmt(this);
-		}
+        final Token name;
+        final List<Token> parameters;
+        final List<Stmt> body;
+    }
 
-		final Expr condition;
-		final Stmt body;
-	}
+    static class Var extends Stmt {
+        Var(Token name, Expr initializer) {
+            this.name = name;
+            this.initializer = initializer;
+        }
 
-	static class Break extends Stmt {
-		Break(Token command) {
-			this.command = command;
-		}
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitVarStmt(this);
+        }
 
-		<R> R accept(Visitor<R> visitor) {
-			return visitor.visitBreakStmt(this);
-		}
+        final Token name;
+        final Expr initializer;
+    }
 
-		final Token command;
-	}
+    static class If extends Stmt {
+        If(Expr condition, Stmt thenBranch, Stmt elseBranch) {
+            this.condition = condition;
+            this.thenBranch = thenBranch;
+            this.elseBranch = elseBranch;
+        }
 
-	abstract <R> R accept(Visitor<R> visitor);
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitIfStmt(this);
+        }
+
+        final Expr condition;
+        final Stmt thenBranch;
+        final Stmt elseBranch;
+    }
+
+    static class While extends Stmt {
+        While(Expr condition, Stmt body) {
+            this.condition = condition;
+            this.body = body;
+        }
+
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitWhileStmt(this);
+        }
+
+        final Expr condition;
+        final Stmt body;
+    }
+
+    static class Break extends Stmt {
+        Break(Token command) {
+            this.command = command;
+        }
+
+        <R> R accept(Visitor<R> visitor) {
+            return visitor.visitBreakStmt(this);
+        }
+
+        final Token command;
+    }
+
+    abstract <R> R accept(Visitor<R> visitor);
 }
