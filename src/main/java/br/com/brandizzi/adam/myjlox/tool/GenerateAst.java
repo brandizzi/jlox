@@ -16,6 +16,7 @@ public class GenerateAst {
             outputDir, "Expr",
             Arrays.asList(
                 "Ternary : Expr first, Expr middle, Expr last",
+                "Function  : List<Token> parameters, List<Stmt> body",
                 "Assign   : Token name, Expr value",
                 "Binary   : Expr left, Token operator, Expr right",
                 "Call     : Expr callee, Token paren, List<Expr> arguments",
