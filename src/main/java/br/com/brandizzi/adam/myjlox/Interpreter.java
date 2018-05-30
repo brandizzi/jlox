@@ -1,7 +1,9 @@
 package br.com.brandizzi.adam.myjlox;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import br.com.brandizzi.adam.myjlox.Expr.Binary;
 import br.com.brandizzi.adam.myjlox.Expr.Function;
@@ -11,7 +13,6 @@ import br.com.brandizzi.adam.myjlox.Expr.Ternary;
 import br.com.brandizzi.adam.myjlox.Expr.Unary;
 import br.com.brandizzi.adam.myjlox.Expr.Variable;
 import br.com.brandizzi.adam.myjlox.Stmt.Break;
-import br.com.brandizzi.adam.myjlox.Stmt.Return;
 
 public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
     Object uninitializedValue = new Object();
@@ -21,6 +22,8 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
     String lastExpressionValue;
 
     private boolean breakLoop = false;
+
+    private Map<Expr, Integer> locals = new HashMap<>();
 
     Interpreter() {
         globals.define("clock", new LoxCallable() {
@@ -221,7 +224,7 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
 
     @Override
     public Object visitVariableExpr(Variable expr) {
-        Object value = environment.get(expr.name);
+        Object value = lookUpVariable(expr.name, expr);
 
         if (value == uninitializedValue) {
             throw new RuntimeError(
@@ -233,11 +236,25 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
         return value;
     }
 
+    private Object lookUpVariable(Token name, Expr expr) {
+        Integer distance = locals.get(expr);
+        if (distance != null) {
+            return environment.getAt(distance, name.lexeme);
+        } else {
+            return globals.get(name);
+        }
+    }
+
     @Override
     public Object visitAssignExpr(Expr.Assign expr) {
         Object value = evaluate(expr.value);
 
-        environment.assign(expr.name, value);
+        Integer distance = locals.get(expr);
+        if (distance != null) {
+          environment.assignAt(distance, expr.name, value);
+        } else {
+          globals.assign(expr.name, value);
+        }
         return value;
     }
 
@@ -342,11 +359,15 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
         if (stmt.value != null)
             value = evaluate(stmt.value);
 
-        throw new br.com.brandizzi.adam.myjlox.Return(value);
+        throw new Return(value);
     }
 
     @Override
     public Object visitFunctionExpr(Function expr) {
         return new LoxFunction(expr, environment);
+    }
+
+    public void resolve(Expr expr, int depth) {
+        locals.put(expr, depth);
     }
 }

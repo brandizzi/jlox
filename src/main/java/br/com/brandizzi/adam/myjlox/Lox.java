@@ -82,6 +82,12 @@ public class Lox {
         if (hadError)
             return null;
 
+        Resolver resolver = new Resolver(interpreter);
+        resolver.resolve(statements);
+
+        if (hadError)
+            return null;
+
         if (statements == null)
             return null;
         Stmt lastStatement = statements.get(statements.size() - 1);

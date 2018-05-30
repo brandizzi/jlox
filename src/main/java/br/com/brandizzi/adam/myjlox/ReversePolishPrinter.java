@@ -3,6 +3,7 @@ package br.com.brandizzi.adam.myjlox;
 import br.com.brandizzi.adam.myjlox.Expr.Assign;
 import br.com.brandizzi.adam.myjlox.Expr.Binary;
 import br.com.brandizzi.adam.myjlox.Expr.Call;
+import br.com.brandizzi.adam.myjlox.Expr.Function;
 import br.com.brandizzi.adam.myjlox.Expr.Grouping;
 import br.com.brandizzi.adam.myjlox.Expr.Literal;
 import br.com.brandizzi.adam.myjlox.Expr.Logical;
@@ -72,5 +73,11 @@ public class ReversePolishPrinter implements Expr.Visitor<String> {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+    @Override
+    public String visitFunctionExpr(Function expr) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 }
