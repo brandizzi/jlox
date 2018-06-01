@@ -1,8 +1,10 @@
 package br.com.brandizzi.adam.myjlox;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Stack;
 
 import br.com.brandizzi.adam.myjlox.Expr.Function;
@@ -12,6 +14,7 @@ import br.com.brandizzi.adam.myjlox.Stmt.Break;
 class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     private final Interpreter interpreter;
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
+    private final Stack<List<Token>> useCheck = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
 
     Resolver(Interpreter interpreter) {
@@ -38,10 +41,15 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     private void beginScope() {
         scopes.push(new HashMap<String, Boolean>());
+        useCheck.push(new ArrayList<Token>());
+
     }
 
     private void endScope() {
-        scopes.pop();
+        List<Token> count = useCheck.pop();
+        for (Token token : count) {
+            Lox.error(token, "Local variable never used.");
+        }
     }
 
     @Override
@@ -70,6 +78,9 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         }
 
         scope.put(name.lexeme, false);
+
+        List<Token> count = useCheck.peek();
+        count.add(name);
     }
 
     private void define(Token name) {
@@ -85,6 +96,14 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
             Lox.error(
                 expr.name, "Cannot read local variable in its own initializer."
             );
+        }
+
+        List<Token> it = useCheck.peek();
+        List<Token> count = new ArrayList<Token>(it);
+        for (Token token : count) {
+            if (token.lexeme.equals(expr.name.lexeme)) {
+                it.remove(token);
+            }
         }
 
         resolveLocal(expr, expr.name);
