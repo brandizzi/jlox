@@ -2,6 +2,7 @@ package br.com.brandizzi.adam.myjlox;
 
 import br.com.brandizzi.adam.myjlox.Expr.Assign;
 import br.com.brandizzi.adam.myjlox.Expr.Call;
+import br.com.brandizzi.adam.myjlox.Expr.Function;
 import br.com.brandizzi.adam.myjlox.Expr.Logical;
 import br.com.brandizzi.adam.myjlox.Expr.Ternary;
 import br.com.brandizzi.adam.myjlox.Expr.Variable;
@@ -101,4 +102,10 @@ class Executor implements Expr.Visitor<Double> {
 		// TODO Auto-generated method stub
 		return null;
 	}
+
+    @Override
+    public Double visitFunctionExpr(Function expr) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
