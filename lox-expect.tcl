@@ -15,8 +15,8 @@ expect "\[line 4\] Error at 'b': Local variable never used."
 
 spawn java -classpath target/classes/ br.com.brandizzi.adam.myjlox.Lox counter.lox
 expect {
-  "1"
-  "2"
+  "1" {}
+  "2" {}
 }
 
 interact
