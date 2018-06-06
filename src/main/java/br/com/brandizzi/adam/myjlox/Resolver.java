@@ -50,6 +50,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         for (Token token : count) {
             Lox.error(token, "Local variable never used.");
         }
+        scopes.pop();
     }
 
     @Override
@@ -98,14 +99,6 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
             );
         }
 
-        List<Token> it = useCheck.peek();
-        List<Token> count = new ArrayList<Token>(it);
-        for (Token token : count) {
-            if (token.lexeme.equals(expr.name.lexeme)) {
-                it.remove(token);
-            }
-        }
-
         resolveLocal(expr, expr.name);
         return null;
     }
@@ -114,6 +107,14 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         for (int i = scopes.size() - 1; i >= 0; i--) {
             if (scopes.get(i).containsKey(name.lexeme)) {
                 interpreter.resolve(expr, scopes.size() - 1 - i);
+
+                List<Token> it = useCheck.get(i);
+                List<Token> count = new ArrayList<Token>(it);
+                for (Token token : count) {
+                    if (token.lexeme.equals(name.lexeme)) {
+                        it.remove(token);
+                    }
+                }
                 return;
             }
         }
