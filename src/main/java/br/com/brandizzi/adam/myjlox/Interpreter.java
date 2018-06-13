@@ -224,7 +224,7 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
 
     @Override
     public Object visitVariableExpr(Variable expr) {
-        Object value = lookUpVariable(expr.name, expr);
+        Object value = lookUpVariable(expr);
 
         if (value == uninitializedValue) {
             throw new RuntimeError(
@@ -236,12 +236,12 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
         return value;
     }
 
-    private Object lookUpVariable(Token name, Expr expr) {
+    private Object lookUpVariable(Expr.Variable expr) {
         Integer distance = locals.get(expr);
         if (distance != null) {
-            return environment.getAt(distance, name.lexeme);
+            return environment.getAt(distance, expr.index);
         } else {
-            return globals.get(name);
+            return globals.get(expr.name);
         }
     }
 
@@ -251,7 +251,7 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
 
         Integer distance = locals.get(expr);
         if (distance != null) {
-          environment.assignAt(distance, expr.name, value);
+          environment.assignAt(distance, expr.index, value);
         } else {
           globals.assign(expr.name, value);
         }
@@ -367,7 +367,8 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
         return new LoxFunction(expr, environment);
     }
 
-    public void resolve(Expr expr, int depth) {
+    public void resolve(Expr.Indexed expr, int depth, int index) {
+        expr.index = index;
         locals.put(expr, depth);
     }
 }

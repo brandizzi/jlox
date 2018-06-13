@@ -16,6 +16,15 @@ public class EnvironmentTest {
     }
 
     @Test
+    public void testDefineIndex() {
+        Environment environment = new Environment();
+        
+        Assert.assertEquals(0, environment.define("a", "1"));
+        Assert.assertEquals(1, environment.define("b", "12"));
+        Assert.assertEquals(2, environment.define("c", "123"));
+    }
+    
+    @Test
     public void testAssign() {
         Environment environment = new Environment();
         
@@ -92,7 +101,61 @@ public class EnvironmentTest {
         Assert.assertEquals(1, environment.getAt(1, "a"));
         Assert.assertEquals(2, environment.getAt(0, "a"));
     }
+    
+    @Test
+    public void testDefineAndGet() {
+        Environment environment = new Environment();
+        
+        int index1 = environment.define("a", "1");
+        Assert.assertEquals("1", environment.get(index1));
+        int index2 = environment.define("b", "12");
+        Assert.assertEquals("12", environment.get(index2));
+        int index3 = environment.define("c", "123");
+        Assert.assertEquals("123", environment.get(index3));
+    }
 
+    @Test
+    public void testDefineAndGetAt() {
+        Environment ancestor = new Environment();
+        Environment environment = new Environment(ancestor);
+        
+        int index1 = ancestor.define("a", "1");
+        Assert.assertEquals("1", environment.getAt(1, index1));
+        int index2 = ancestor.define("aa", "1");
+        Assert.assertEquals("1", environment.getAt(1, index2));
+        int index3 = environment.define("b", "12");
+        Assert.assertEquals("12", environment.getAt(0, index3));
+        int index4 = environment.define("c", "123");
+        Assert.assertEquals("123", environment.getAt(0, index4));
+    }
+    
+    @Test
+    public void testDefineAndAssign() {
+        Environment environment = new Environment();
+        
+        int index1 = environment.define("a", "1");
+        environment.assign(index1, "2");
+        Assert.assertEquals("2", environment.get(index1));
+    }
+
+
+    @Test
+    public void testDefineAndAssignAt() {
+        Environment ancestor = new Environment();
+        Environment environment = new Environment(ancestor);
+        
+        int index1 = ancestor.define("a", "1");
+        int index2 = environment.define("aa", "1");
+        
+        environment.assignAt(0, index1, "e");
+        environment.assignAt(1, index1, "a");
+        
+        Assert.assertEquals(environment.getAt(0, index1), "e");
+        Assert.assertEquals(environment.getAt(1, index2), "a");
+
+
+    }
+    
     private Token variable(String varName) {
         return new Token(TokenType.IDENTIFIER, varName, varName, 1);
     }

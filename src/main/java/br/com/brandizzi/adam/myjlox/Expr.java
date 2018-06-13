@@ -54,8 +54,12 @@ abstract class Expr {
         final List<Token> parameters;
         final List<Stmt> body;
     }
+    
+    static abstract class Indexed extends Expr {
+        int index;
+    }
 
-    static class Assign extends Expr {
+    static class Assign extends Indexed {
         Assign(Token name, Expr value) {
             this.name = name;
             this.value = value;
@@ -139,7 +143,7 @@ abstract class Expr {
         final Expr right;
     }
 
-    static class Variable extends Expr {
+    static class Variable extends Indexed {
         Variable(Token name) {
             this.name = name;
         }

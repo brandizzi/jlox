@@ -1,11 +1,14 @@
 package br.com.brandizzi.adam.myjlox;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 class Environment {
     final Environment enclosing;
-    private final Map<String, Object> values = new HashMap<>();
+    private final Map<String, Integer> indexMap = new HashMap<>();
+    private final List<Object> values = new ArrayList<>();
 
     Environment() {
         enclosing = null;
@@ -15,41 +18,57 @@ class Environment {
         this.enclosing = enclosing;
     }
 
-    void define(String name, Object value) {
-        values.put(name, value);
+    int define(String name, Object value) {
+        values.add(value);
+        int index = values.size() - 1;
+        indexMap.put(name, index);
+        return index;
     }
 
     Object get(Token name) {
-        if (values.containsKey(name.lexeme)) {
-            return values.get(name.lexeme);
+        try {
+            return get(name.lexeme);
+        } catch (RuntimeError e) {
+            throw new RuntimeError(name, e.getMessage());
+        }
+    }
+
+    private Object get(String name) {
+        if (indexMap.containsKey(name)) {
+            return get(indexMap.get(name));
         }
 
         if (enclosing != null)
             return enclosing.get(name);
-
-        throw new RuntimeError(
-            name, "Undefined variable '" + name.lexeme + "'."
-        );
+        else
+            throw new RuntimeError(null, "Undefined variable '" + name + "'.");
     }
 
     void assign(Token name, Object value) {
-        if (values.containsKey(name.lexeme)) {
-            values.put(name.lexeme, value);
+        String lexeme = name.lexeme;
+        try {
+            assign(lexeme, value);
+        } catch (RuntimeError e) {
+            throw new RuntimeError(name, e.getMessage());
+        }
+    }
+
+    void assign(String name, Object value) {
+        if (indexMap.containsKey(name)) {
+            assign(indexMap.get(name), value);
             return;
         }
 
         if (enclosing != null) {
             enclosing.assign(name, value);
             return;
+        } else {
+            throw new RuntimeError(null, "Undefined variable '" + name + "'.");
         }
-
-        throw new RuntimeError(
-            name, "Undefined variable '" + name.lexeme + "'."
-        );
     }
 
     Object getAt(int distance, String name) {
-        return ancestor(distance).values.get(name);
+        return ancestor(distance).get(name);
     }
 
     Environment ancestor(int distance) {
@@ -62,6 +81,22 @@ class Environment {
     }
 
     void assignAt(int distance, Token name, Object value) {
-        ancestor(distance).values.put(name.lexeme, value);
+        ancestor(distance).assign(name.lexeme, value);
+    }
+
+    Object get(int index) {
+        return values.get(index);
+    }
+
+    Object getAt(int distance, int index) {
+        return ancestor(distance).get(index);
+    }
+
+    void assign(int index, Object value) {
+        values.set(index, value);
+    }
+
+    public void assignAt(int distance, int index, Object value) {
+        ancestor(distance).assign(index, value);
     }
 }

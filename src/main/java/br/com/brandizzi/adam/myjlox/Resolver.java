@@ -14,6 +14,8 @@ import br.com.brandizzi.adam.myjlox.Stmt.Break;
 class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     private final Interpreter interpreter;
     private final Stack<Map<String, Boolean>> scopes = new Stack<>();
+    private final Stack<Integer> counts = new Stack<>();
+    private final Stack<Map<String, Integer>> indicesMaps = new Stack<>();
     private final Stack<List<Token>> useCheck = new Stack<>();
     private FunctionType currentFunction = FunctionType.NONE;
 
@@ -41,6 +43,8 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
     private void beginScope() {
         scopes.push(new HashMap<String, Boolean>());
+        indicesMaps.push(new HashMap<String, Integer>());
+        counts.push(-1);
         useCheck.push(new ArrayList<Token>());
 
     }
@@ -50,6 +54,8 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         for (Token token : count) {
             Lox.error(token, "Local variable never used.");
         }
+        indicesMaps.pop();
+        counts.pop();
         scopes.pop();
     }
 
@@ -80,8 +86,14 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
         scope.put(name.lexeme, false);
 
-        List<Token> count = useCheck.peek();
-        count.add(name);
+        int count = counts.pop();
+        count += 1;
+        counts.push(count);
+        Map<String, Integer> indexMap = indicesMaps.peek();
+        indexMap.put(name.lexeme, count);
+
+        List<Token> check = useCheck.peek();
+        check.add(name);
     }
 
     private void define(Token name) {
@@ -103,10 +115,13 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         return null;
     }
 
-    private void resolveLocal(Expr expr, Token name) {
+    private void resolveLocal(Expr.Indexed expr, Token name) {
         for (int i = scopes.size() - 1; i >= 0; i--) {
             if (scopes.get(i).containsKey(name.lexeme)) {
-                interpreter.resolve(expr, scopes.size() - 1 - i);
+                Map<String, Integer> indexMap = indicesMaps.get(i);
+                interpreter.resolve(
+                    expr, scopes.size() - 1 - i, indexMap.get(name.lexeme)
+                );
 
                 List<Token> it = useCheck.get(i);
                 List<Token> count = new ArrayList<Token>(it);
