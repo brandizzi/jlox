@@ -1,0 +1,140 @@
+http://craftinginterpreters.com/a-map-of-the-territory.html
+1. Lua. Implements lexer and parser without Lex and Yacc. see llexer.c and lparser.c.
+   Python. Uses ASDL (what is this?) but apparenlty the rest is C as well. lexer is in tokenizer.c.
+2. JIT is very complicated to implement. Also, it slows down startup. Sometimes the gained efficiency is not worth the work.
+3. An on-the-fly interpreter is very useful for playing around, studying and debugging. In Lisp, it would also be somewhat easy to implement.
+
+http://craftinginterpreters.com/the-lox-language.html
+1. Tried to add a var to the last arg of a for loop. It is invalid, it should be an exprssions. print is reserved. No statements in class body. Accepts only the same number of specified arguments.
+2.
+3. IO is fundamental, especially reading from user and getting command line arguments. Integers are important. Some way to convert to string.
+
+http://craftinginterpreters.com/scanning.html#challenges
+1. To say that Python's and Haskell's lexical grammars are not regular means not all their tokens can be matched by a reguoar expression. I'm not sure why they aren't but I'd think about indentation. Indeed, sematinc indentation implicates that spaces are meaningful tokens... Except that they are not in other part of the expression. So the kind of the token depends on the context, on where the space token is. I'd bet one could make a tokenizer that generated space tokens and only the syntatic level would check their value but it may not be the best way, i dunno...
+
+2. In CoffeeScript, indentation can define scope. In Ruby, newlines make the turn of semicolons IIRC, and a space between an identifier and an open paren makes the difference between a function's parameter list and a priorization paremetreziation. In C preprocessor, if you have a macro call, it should necessarily have the open paren just after the macro name; otherwise, the macro is not expanded. That's a common trick to call a macro one time and a funtion of the same name other time.
+
+3. Well, for now, I cannot see many uses for that. Pragmas maybe? Yes, that's a good example! Haskell and Turbo Pascal use it, as well as the # -*- coding stiffu in pythonm.
+
+4. Nested comments were easy to implement with a recursive function. The challenges were mostly details of the logic.
+
+http://craftinginterpreters.com/representing-code.html#challenges
+
+1. 
+exprList -> expr
+exprList -> exprList "," expr
+
+expr -> IDENTIFIER
+expr -> NUMBER
+expr -> expr "()"
+expr -> expr "(" exprList ")"
+expr -> expr "." IDENTIFIER
+
+It generates something similar to function calls AND dot notation, with the caveat that numbers can also be called and have attributes. (Ok, I'm talking semantics here but it givs the idea)
+
+2. TO DO
+
+3. See project.
+
+http://craftinginterpreters.com/parsing-expressions.html#challenges
+1.
+program     → declaration* EOF ;
+
+declaration → funDecl
+            | varDecl
+            | statement ;
+
+funDecl  → "fun" function ;
+function → IDENTIFIER funSpec;
+funSpec → "(" parameters? ")" block ;
+parameters → IDENTIFIER ( "," IDENTIFIER )* ;
+            
+varDecl → "var" IDENTIFIER ( "=" expression )? ";" ;
+
+statement → exprStmt
+          | forStmt
+          | ifStmt
+          | printStmt
+          | returnStmt
+          | whileStmt
+          | block ;
+
+returnStmt → "return" expression? ";" ;
+
+block     → "{" declaration* "}" ;
+whileStmt → "while" "(" expression ")" statement ;
+ifStmt    → "if" "(" expression ")" statement ( "else" statement )? ;
+
+forStmt   → "for" "(" ( varDecl | exprStmt | ";" )
+                      expression? ";"
+                      expression? ")" statement ;
+
+
+
+exprStmt  → expression ";" ;
+printStmt → "print" expression ";" ;
+expression →  funExpr ;
+funExpr  → assignment;
+assignment → identifier "=" assignment
+           | logic_or ;
+logic_or   → logic_and ( "or" logic_and )* ;
+logic_and  → equality ( "and" equality )* ;
+series     → ternary ( "," ternary ) ;
+ternary    → equality ( "?" expression ":" equality )*
+equality       → comparison ( ( "!=" | "==" ) comparison )* ;
+comparison     → addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
+addition       → multiplication ( ( "-" | "+" ) multiplication )* ;
+multiplication → unary ( ( "/" | "*" ) unary )* ;
+unary → ( "!" | "-" ) unary | call ;
+call  → primary ( "(" arguments? ")" )* ;
+arguments → expression ( "," expression )* ;
+primary        → NUMBER | STRING | "false" | "true" | "nil"
+               | "(" expression ")"   | "fun" funSpec | IDENTIFIER ;
+               
+2. Syntax updated above and in the code.
+
+Ternary has one of the lowest precedences among expressions, just above the comma. That means that almost all expressions, expect commas, have higher precedence than it... on the left and on the right. IN the middle, its precedence is as high as parenthetization. Also, ternary is right associative, which allows it to have recursive ternaries as their last argumetn.
+
+http://craftinginterpreters.com/evaluating-expressions.html#challenges
+1. I would not allow comparing between different types. It is common in other languages (C, PHP, JavaScript, Perl...) and tends to cause bugs. Python used to accept that and dropped it, so it is a signal they didn't find it worth it. Yet, I'd gladly implement ordering comparation between two strings (and two arrays), using lexicographic ordering.
+
+2. See e149bf045f08.
+
+3. Two options I know of: raise a runtime error/throw exception, or return Infinite. I see more cases of runtime errors in other languages, and would feel more comfortable with that. I'd also note Infinity is only possible with floating points, not integers; not a issue in Lox but important one elsewhere.
+
+See 8e898a6abead.
+
+http://craftinginterpreters.com/statements-and-state.html#challenges
+1. See 94240e9bd794.
+
+2. See 498e8e4ba1af.
+
+3. I would expect an error or undefined behavior. The var declaration in the block would shadow the one before. But one can think about it incrementing the global a variable and setting the new one. Indeed, it appears JavaScritp does that, and so does Lox.
+
+http://craftinginterpreters.com/control-flow.html#challenges
+1. It is possible to implement conditional execution this way: you have two functions, both receiving two orther functions as parameters each. One function executes its fist parameter; the other executes the second parameter. So once I want to execute one of both conditions, I give the two functions the same arguments. This is how SmallTalk does it, and the functions are the boolean values in smalltalk. Nifty!
+
+2. We can create a loop by executing a function through a recursive function. This is quite straightfoward, indeed. This is very common (at least in principle) for Lisps and other FP languages. To be efficient, though, we may need tail recursion and to be effective, tail recursion may require a specific call format.
+
+3.  See:
+cf281bb395a6 break: interpreter interrupts execution; visit to break sets flat to interrupt.
+7697b2049be2 break: parser convert token to statement. Note we have a flag that reports if the token is inside a loop.
+b1c56a60af1a break: new statement.
+cf9c125e8b10 break: create new token.
+
+http://craftinginterpreters.com/functions.html#challenges
+1. HYPOTHESIS: Apparently, a message is defined by the name of its parameters. For each parameter, there is a name in the message. This way, if we have an erroneous count of arguments, no message will be found for it: no need to check the number of arguments. Makes sense?    
+
+2. For supporting anonymous functions, see 79388e8d67cc. 
+
+To handle the case of an anonymous function expression statement, I checked for an opening parentesis after "fun" in the declaration() level. If it was found, we went back one token. For that, I added the "rewind()" private operation to parser. This way, we try one thing and if it fails we go back to other alternatives. If we find a function declaration, it is done; if not, then it will only be handled as a primary expression that creates anon functions.
+
+3. As far as I tested, it is valid in Lox, but we never decided that explicity. Some languages allow that (e.g. JavaScript): I tested it here and it worked with var, let and const. Other languages do not allow that. In C, for example, it is not possible, not in Java: there, they say the variable is already declared in the scope (so params and locals share scope). I guess the same applies for most languages without declaration.
+
+http://craftinginterpreters.com/resolving-and-binding.html#challenges
+
+1. The function body where the function variable would be used will not be executed to initialize the function variable. consequently, when the variable is used, we are sure it is initialized. That does not happen with a more usual variable: one may try to initialize it with itself, and it will happen exactly at the initialization time, which... well, can be done (seee http://craftinginterpreters.com/resolving-and-binding.html#resolving-variable-declarations) but even if done, is confusing and error-prone (and not really useful).
+
+2. JavaScript let you do this with the var keyword, but the let keyword prevents that; TBH both are plausible choices but I understand the choce for let. It does not make sense in Python, since thiere is no variable declaration there. In Java, it is not even possible to declare a var with same name inside an inner block. Surprisingly, in C, it is possible and the inner variable is initialized with itself (and since it is not initialized, it get garbage); I mean, I guess this is it, but would make sense because it would maximize memory corruption, which is a design goal in C.
+
+3. Done! See 01143bd13aa9. (NOt very elegant but working)
