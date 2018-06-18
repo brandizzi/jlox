@@ -55,6 +55,14 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
     }
 
     @Override
+    public Void visitClassStmt(Stmt.Class stmt) {
+        environment.define(stmt.name.lexeme, null);
+        LoxClass klass = new LoxClass(stmt.name.lexeme);
+        environment.assign(stmt.name, klass);
+        return null;
+    }
+
+    @Override
     public Void visitVarStmt(Stmt.Var stmt) {
         Object value = uninitializedValue;
         if (stmt.initializer != null) {
@@ -251,9 +259,9 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
 
         Integer distance = locals.get(expr);
         if (distance != null) {
-          environment.assignAt(distance, expr.index, value);
+            environment.assignAt(distance, expr.index, value);
         } else {
-          globals.assign(expr.name, value);
+            globals.assign(expr.name, value);
         }
         return value;
     }

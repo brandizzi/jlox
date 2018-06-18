@@ -4,6 +4,7 @@ import static br.com.brandizzi.adam.myjlox.TokenType.AND;
 import static br.com.brandizzi.adam.myjlox.TokenType.BANG;
 import static br.com.brandizzi.adam.myjlox.TokenType.BANG_EQUAL;
 import static br.com.brandizzi.adam.myjlox.TokenType.BREAK;
+import static br.com.brandizzi.adam.myjlox.TokenType.CLASS;
 import static br.com.brandizzi.adam.myjlox.TokenType.COMMA;
 import static br.com.brandizzi.adam.myjlox.TokenType.ELSE;
 import static br.com.brandizzi.adam.myjlox.TokenType.EOF;
@@ -60,6 +61,8 @@ class Parser {
 
     private Stmt declaration() {
         try {
+            if (match(CLASS))
+                return classDeclaration();
             if (match(FUN)) {
                 if (check(LEFT_PAREN)) {
                     rewind();
@@ -75,6 +78,20 @@ class Parser {
             synchronize();
             return null;
         }
+    }
+
+    private Stmt classDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect class name.");
+        consume(LEFT_BRACE, "Expect '{' before class body.");
+
+        List<Stmt.Function> methods = new ArrayList<>();
+        while (!check(RIGHT_BRACE) && !isAtEnd()) {
+            methods.add(function("method"));
+        }
+
+        consume(RIGHT_BRACE, "Expect '}' after class body.");
+
+        return new Stmt.Class(name, methods);
     }
 
     private void rewind() {
