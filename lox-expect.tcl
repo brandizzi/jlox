@@ -1,15 +1,20 @@
-#!/usr/bin/expect -f
+#!/usr/bin/expect -f 
+
+set timeout 60
 
 spawn -noecho java -classpath target/classes/ br.com.brandizzi.adam.myjlox.Lox badfun.lox
-expect "\[line 3\] Error at 'a': Variable with this name already declared in this scope.
+
+expect -exact "\[line 3\] Error at 'a': variable with this name already declared in this scope.
 \[line 2\] Error at 'a': Local variable never used.
 \[line 3\] Error at 'a': Local variable never used."
 
+
 spawn java -classpath target/classes/ br.com.brandizzi.adam.myjlox.Lox badret.lox
-expect "\[line 1\] Error at 'return': Cannot return from top-level code."
+expect -exact  "\[line 1\] Error at 'return': Cannot return from top-level code."
 
 spawn java -classpath target/classes/ br.com.brandizzi.adam.myjlox.Lox checkuse.lox
 expect "\[line 4\] Error at 'b': Local variable never used."
+
 
 spawn java -classpath target/classes/ br.com.brandizzi.adam.myjlox.Lox counter.lox
 expect "1\NEWLINE2"
@@ -107,10 +112,15 @@ expect "\[line 2\] Error at 'a': Variable with this name already declared in thi
 \[line 1\] Error at 'a': Local variable never used.
 \[line 2\] Error at 'a': Local variable never used."
 
-
 spawn java -classpath target/classes/ br.com.brandizzi.adam.myjlox.Lox timeit.lox
 expect -re {[0-9]\.[0-9]+}
 
+
+spawn java -classpath target/classes/ br.com.brandizzi.adam.myjlox.Lox twovars.lox
+expect "1
+2
+3
+4"
 
 #interact
 
