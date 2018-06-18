@@ -115,7 +115,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         return null;
     }
 
-    private void resolveLocal(Expr.Indexed expr, Token name) {
+    private void resolveLocal(Indexed expr, Token name) {
         for (int i = scopes.size() - 1; i >= 0; i--) {
             if (scopes.get(i).containsKey(name.lexeme)) {
                 Map<String, Integer> indexMap = indicesMaps.get(i);

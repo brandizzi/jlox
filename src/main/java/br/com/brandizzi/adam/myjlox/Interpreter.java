@@ -367,7 +367,7 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
         return new LoxFunction(expr, environment);
     }
 
-    public void resolve(Expr.Indexed expr, int depth, int index) {
+    public void resolve(Indexed expr, int depth, int index) {
         expr.index = index;
         locals.put(expr, depth);
     }

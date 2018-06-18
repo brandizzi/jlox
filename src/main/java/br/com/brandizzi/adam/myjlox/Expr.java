@@ -54,10 +54,6 @@ abstract class Expr {
         final List<Token> parameters;
         final List<Stmt> body;
     }
-    
-    static abstract class Indexed extends Expr {
-        int index;
-    }
 
     static class Assign extends Indexed {
         Assign(Token name, Expr value) {
