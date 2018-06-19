@@ -20,7 +20,9 @@ public class GenerateAst {
                 "Assign   : Token name, Expr value",
                 "Binary   : Expr left, Token operator, Expr right",
                 "Call     : Expr callee, Token paren, List<Expr> arguments",
+                "Get      : Expr object, Token name",
                 "Grouping : Expr expression", "Literal  : Object value",
+                "Set      : Expr object, Token name, Expr value",
                 "Unary    : Token operator, Expr right",
                 "Variable : Token name",
                 "Logical  : Expr left, Token operator, Expr right"
@@ -66,9 +68,8 @@ public class GenerateAst {
         writer.close();
     }
 
-    private static void defineVisitor(
-        PrintWriter writer, String baseName, List<String> types
-    ) {
+    private static void
+        defineVisitor(PrintWriter writer, String baseName, List<String> types) {
         writer.println("  interface Visitor<R> {");
 
         for (String type : types) {

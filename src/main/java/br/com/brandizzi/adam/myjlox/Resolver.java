@@ -41,6 +41,12 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         stmt.accept(this);
     }
 
+    @Override
+    public Void visitGetExpr(Expr.Get expr) {
+        resolve(expr.object);
+        return null;
+    }
+
     private void beginScope() {
         scopes.push(new HashMap<String, Boolean>());
         indicesMaps.push(new HashMap<String, Integer>());
@@ -142,6 +148,13 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         }
 
         // Not found. Assume it is global.
+    }
+
+    @Override
+    public Void visitSetExpr(Expr.Set expr) {
+        resolve(expr.value);
+        resolve(expr.object);
+        return null;
     }
 
     @Override

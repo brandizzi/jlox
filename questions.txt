@@ -75,8 +75,8 @@ exprStmt  → expression ";" ;
 printStmt → "print" expression ";" ;
 expression →  funExpr ;
 funExpr  → assignment;
-assignment → identifier "=" assignment
-           | logic_or ;
+assignment → ( call "." )? IDENTIFIER "=" assignment
+           | logic_or;
 logic_or   → logic_and ( "or" logic_and )* ;
 logic_and  → equality ( "and" equality )* ;
 series     → ternary ( "," ternary ) ;
@@ -86,7 +86,7 @@ comparison     → addition ( ( ">" | ">=" | "<" | "<=" ) addition )* ;
 addition       → multiplication ( ( "-" | "+" ) multiplication )* ;
 multiplication → unary ( ( "/" | "*" ) unary )* ;
 unary → ( "!" | "-" ) unary | call ;
-call  → primary ( "(" arguments? ")" )* ;
+call → primary ( "(" arguments? ")" | "." IDENTIFIER )* ;
 arguments → expression ( "," expression )* ;
 primary        → NUMBER | STRING | "false" | "true" | "nil"
                | "(" expression ")"   | "fun" funSpec | IDENTIFIER ;
