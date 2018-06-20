@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Stack;
 
 import br.com.brandizzi.adam.myjlox.Expr.Function;
@@ -69,6 +68,20 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     public Void visitClassStmt(Stmt.Class stmt) {
         declare(stmt.name);
         define(stmt.name);
+
+        beginScope();
+
+        Token that = new Token(TokenType.THIS, "this", "this", 0);
+        declare(that);
+    
+
+        for (Stmt.Function method : stmt.methods) {
+            FunctionType declaration = FunctionType.METHOD;
+            resolveFunction(method, declaration);
+        }
+
+        endScope();
+
         return null;
     }
 
@@ -128,7 +141,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         return null;
     }
 
-    private void resolveLocal(Indexed expr, Token name) {
+    private void resolveLocal(Var expr, Token name) {
         for (int i = scopes.size() - 1; i >= 0; i--) {
             if (scopes.get(i).containsKey(name.lexeme)) {
                 Map<String, Integer> indexMap = indicesMaps.get(i);
@@ -173,10 +186,20 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         return null;
     }
 
+    @Override
+    public Void visitThisExpr(Expr.This expr) {
+        resolveLocal(expr, expr.keyword);
+        return null;
+    }
+
     private void resolveFunction(Stmt.Function function) {
-        resolveFunction(
-            function.parameters, function.body, FunctionType.FUNCTION
-        );
+        resolveFunction(function, FunctionType.FUNCTION);
+
+    }
+
+    private void
+        resolveFunction(Stmt.Function function, FunctionType functionType) {
+        resolveFunction(function.parameters, function.body, functionType);
     }
 
     private void resolveFunction(
@@ -187,6 +210,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         currentFunction = type;
 
         beginScope();
+
         for (Token param : parameters) {
             declare(param);
             define(param);

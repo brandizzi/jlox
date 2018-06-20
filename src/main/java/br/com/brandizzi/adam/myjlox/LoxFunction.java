@@ -9,16 +9,20 @@ class LoxFunction implements LoxCallable {
     private String name;
 
     LoxFunction(Stmt.Function declaration, Environment closure) {
+        this(declaration.parameters, declaration.body, closure);
         name = declaration.name.lexeme;
-        parameters = declaration.parameters;
-        body = declaration.body;
+    }
+
+    LoxFunction(
+        List<Token> parameters, List<Stmt> body, Environment closure
+    ) {
+        this.parameters = parameters;
+        this.body = body;
         this.closure = closure;
     }
 
     LoxFunction(Expr.Function expression, Environment closure) {
-        parameters = expression.parameters;
-        body = expression.body;
-        this.closure = closure;
+        this(expression.parameters, expression.body, closure);
     }
 
     @Override
@@ -50,4 +54,11 @@ class LoxFunction implements LoxCallable {
             return "<anon fn>";
         }
     }
+
+    LoxFunction bind(LoxInstance instance) {
+        Environment environment = new Environment(closure);
+        environment.define("this", instance);
+        return new LoxFunction(parameters, body, environment);
+      }
+
 }

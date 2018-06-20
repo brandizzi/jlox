@@ -57,7 +57,13 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
     @Override
     public Void visitClassStmt(Stmt.Class stmt) {
         environment.define(stmt.name.lexeme, null);
-        LoxClass klass = new LoxClass(stmt.name.lexeme);
+        Map<String, LoxFunction> methods = new HashMap<>();
+        for (Stmt.Function method : stmt.methods) {
+            LoxFunction function = new LoxFunction(method, environment);
+            methods.put(method.name.lexeme, function);
+        }
+
+        LoxClass klass = new LoxClass(stmt.name.lexeme, methods);
         environment.assign(stmt.name, klass);
         return null;
     }
@@ -79,6 +85,12 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
         System.out.println(stringify(value));
         return null;
     }
+    
+    @Override
+    public Object visitThisExpr(Expr.This expr) {
+      return lookUpVariable(expr);
+    }
+
 
     @Override
     public Void visitExpressionStmt(Stmt.Expression stmt) {
@@ -267,7 +279,7 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
         return value;
     }
 
-    private Object lookUpVariable(Expr.Variable expr) {
+    private Object lookUpVariable(Var expr) {
         Integer distance = locals.get(expr);
         if (distance != null) {
             return environment.getAt(distance, expr.index);
@@ -398,7 +410,7 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
         return new LoxFunction(expr, environment);
     }
 
-    public void resolve(Indexed expr, int depth, int index) {
+    public void resolve(Var expr, int depth, int index) {
         expr.index = index;
         locals.put(expr, depth);
     }

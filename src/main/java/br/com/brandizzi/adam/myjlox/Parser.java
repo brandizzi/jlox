@@ -34,6 +34,7 @@ import static br.com.brandizzi.adam.myjlox.TokenType.SEMICOLON;
 import static br.com.brandizzi.adam.myjlox.TokenType.SLASH;
 import static br.com.brandizzi.adam.myjlox.TokenType.STAR;
 import static br.com.brandizzi.adam.myjlox.TokenType.STRING;
+import static br.com.brandizzi.adam.myjlox.TokenType.THIS;
 import static br.com.brandizzi.adam.myjlox.TokenType.TRUE;
 import static br.com.brandizzi.adam.myjlox.TokenType.VAR;
 import static br.com.brandizzi.adam.myjlox.TokenType.WHILE;
@@ -500,6 +501,8 @@ class Parser {
         if (match(NUMBER, STRING)) {
             return new Expr.Literal(previous().literal);
         }
+        
+        if (match(THIS)) return new Expr.This(previous());
 
         if (match(TokenType.IDENTIFIER)) {
             return new Expr.Variable(previous());

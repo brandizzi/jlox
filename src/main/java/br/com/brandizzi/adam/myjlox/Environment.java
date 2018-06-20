@@ -33,7 +33,7 @@ class Environment {
         }
     }
 
-    private Object get(String name) {
+    Object get(String name) {
         if (indexMap.containsKey(name)) {
             return get(indexMap.get(name));
         }
