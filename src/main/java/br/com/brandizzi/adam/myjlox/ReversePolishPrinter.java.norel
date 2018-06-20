@@ -8,7 +8,9 @@ import br.com.brandizzi.adam.myjlox.Expr.Get;
 import br.com.brandizzi.adam.myjlox.Expr.Grouping;
 import br.com.brandizzi.adam.myjlox.Expr.Literal;
 import br.com.brandizzi.adam.myjlox.Expr.Logical;
+import br.com.brandizzi.adam.myjlox.Expr.Set;
 import br.com.brandizzi.adam.myjlox.Expr.Ternary;
+import br.com.brandizzi.adam.myjlox.Expr.This;
 import br.com.brandizzi.adam.myjlox.Expr.Unary;
 import br.com.brandizzi.adam.myjlox.Expr.Variable;
 
@@ -83,6 +85,18 @@ public class ReversePolishPrinter implements Expr.Visitor<String> {
 
     @Override
     public String visitGetExpr(Get expr) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visitSetExpr(Set expr) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String visitThisExpr(This expr) {
         // TODO Auto-generated method stub
         return null;
     }

@@ -5,7 +5,9 @@ import br.com.brandizzi.adam.myjlox.Expr.Call;
 import br.com.brandizzi.adam.myjlox.Expr.Function;
 import br.com.brandizzi.adam.myjlox.Expr.Get;
 import br.com.brandizzi.adam.myjlox.Expr.Logical;
+import br.com.brandizzi.adam.myjlox.Expr.Set;
 import br.com.brandizzi.adam.myjlox.Expr.Ternary;
+import br.com.brandizzi.adam.myjlox.Expr.This;
 import br.com.brandizzi.adam.myjlox.Expr.Variable;
 
 class Executor implements Expr.Visitor<Double> {
@@ -112,6 +114,18 @@ class Executor implements Expr.Visitor<Double> {
 
     @Override
     public Double visitGetExpr(Get expr) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Double visitSetExpr(Set expr) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Double visitThisExpr(This expr) {
         // TODO Auto-generated method stub
         return null;
     }
