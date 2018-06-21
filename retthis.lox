@@ -1,0 +1,8 @@
+class Foo {
+   init(v) {
+       this.v = v;
+   }
+}
+
+var f = Foo(3);
+print f.init(4).v;
