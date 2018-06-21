@@ -1,0 +1,3 @@
+[line 2] Error at 'a': Variable with this name already declared in this scope.
+[line 1] Error at 'a': Local variable never used.
+[line 2] Error at 'a': Local variable never used.
