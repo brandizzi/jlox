@@ -1,0 +1,4 @@
+this.test = 2;
+fun test() {
+  this.test = 3;
+}
