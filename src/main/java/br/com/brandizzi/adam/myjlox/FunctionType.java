@@ -1,5 +1,5 @@
 package br.com.brandizzi.adam.myjlox;
 
 public enum FunctionType {
-    NONE, FUNCTION, METHOD
+    NONE, FUNCTION, METHOD, INITIALIZER
 }
