@@ -63,7 +63,8 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     private void endScope() {
         List<Token> count = useCheck.pop();
         for (Token token : count) {
-            Lox.error(token, "Local variable never used.");
+            if (token.type != TokenType.THIS)
+                Lox.error(token, "Local variable never used.");
         }
         indicesMaps.pop();
         counts.pop();
@@ -76,6 +77,14 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         currentClass = ClassType.CLASS;
         declare(stmt.name);
         define(stmt.name);
+
+        for (Stmt.Function method : stmt.classMethods) {
+            FunctionType declaration = FunctionType.METHOD;
+            if (method.name.lexeme.equals("init")) {
+                declaration = FunctionType.INITIALIZER;
+            }
+            resolveFunction(method, declaration);
+        }
 
         beginScope();
 

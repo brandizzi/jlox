@@ -3,13 +3,23 @@ package br.com.brandizzi.adam.myjlox;
 import java.util.List;
 import java.util.Map;
 
-class LoxClass implements LoxCallable {
+class LoxClass extends LoxInstance implements LoxCallable {
     final String name;
     private final Map<String, LoxFunction> methods;
 
-    LoxClass(String name, Map<String, LoxFunction> methods) {
+    LoxClass(
+        String name, Map<String, LoxFunction> methods,
+        Map<String, LoxFunction> classMethods
+    ) {
+        super(new LoxType(name, classMethods));
         this.name = name;
         this.methods = methods;
+    }
+    
+    protected LoxClass(String name, Map<String, LoxFunction> classMethods) {
+        super(null);
+        this.name = name;
+        this.methods = classMethods;
     }
 
     @Override

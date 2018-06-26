@@ -1,6 +1,9 @@
 package br.com.brandizzi.adam.myjlox;
 
+import java.util.Collections;
 import java.util.List;
+
+import br.com.brandizzi.adam.myjlox.Stmt.Function;
 
 abstract class Stmt {
   interface Visitor<R> {
@@ -50,14 +53,22 @@ abstract class Stmt {
   }
   static class Class extends Stmt {
     Class(Token name, List<Stmt.Function> methods) {
-      this.name = name;
-      this.methods = methods;
+      this(name, methods, Collections.<Function>emptyList());
+    }
+
+    public Class(
+        Token name, List<Function> methods, List<Function> classMethods
+    ) {
+        this.name = name;
+        this.methods = methods;
+        this.classMethods = classMethods;
     }
 
     <R> R accept(Visitor<R> visitor) {
       return visitor.visitClassStmt(this);
     }
 
+    final List<Function> classMethods;
     final Token name;
     final List<Stmt.Function> methods;
   }
