@@ -41,7 +41,10 @@ import static br.com.brandizzi.adam.myjlox.TokenType.WHILE;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+
+import br.com.brandizzi.adam.myjlox.Stmt.Function;
 
 class Parser {
     private final List<Token> tokens;
@@ -88,19 +91,37 @@ class Parser {
 
         List<Stmt.Function> methods = new ArrayList<>();
         List<Stmt.Function> classMethods = new ArrayList<>();
+        List<Stmt.Function> getters = new ArrayList<>();
+
         
         while (!check(RIGHT_BRACE) && !isAtEnd()) {
             if (match(CLASS)) {
-                classMethods.add(function("method"));
+                classMethods.add(function("class method"));
             } else {
-                methods.add(function("method"));
+                Token methodName = consume(IDENTIFIER, "Expect method or getter name.");
+                
+                if (check(TokenType.LEFT_PAREN)) {
+                    consume(LEFT_PAREN, "Expect '(' after function name.");
+                    List<Token> parameters = parameters();
+                    
+                    consume(LEFT_BRACE, "Expect '{' before function body.");
+                    List<Stmt> body = block();
+                    Function method = new Stmt.Function(methodName, parameters, body);
+                    methods.add(method);
+                } else {
+                    consume(LEFT_BRACE, "Expect '{' before function body.");
+                    List<Stmt> body = block();
+                    Function getter = new Stmt.Function(methodName, Collections.<Token>emptyList(), body);
+                    getters.add(getter);
+                }
             }
         }
 
         consume(RIGHT_BRACE, "Expect '}' after class body.");
 
-        return new Stmt.Class(name, methods, classMethods);
+        return new Stmt.Class(name, methods, classMethods, getters);
     }
+
 
     private void rewind() {
         current--;
@@ -109,6 +130,14 @@ class Parser {
     private Stmt.Function function(String kind) {
         Token name = consume(IDENTIFIER, "Expect " + kind + " name.");
         consume(LEFT_PAREN, "Expect '(' after " + kind + " name.");
+        List<Token> parameters = parameters();
+
+        consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
+        List<Stmt> body = block();
+        return new Stmt.Function(name, parameters, body);
+    }
+
+    private List<Token> parameters() {
         List<Token> parameters = new ArrayList<>();
         if (!check(RIGHT_PAREN)) {
             do {
@@ -120,10 +149,7 @@ class Parser {
             } while (match(COMMA));
         }
         consume(RIGHT_PAREN, "Expect ')' after parameters.");
-
-        consume(LEFT_BRACE, "Expect '{' before " + kind + " body.");
-        List<Stmt> body = block();
-        return new Stmt.Function(name, parameters, body);
+        return parameters;
     }
 
     private Stmt varDeclaration() {
@@ -272,19 +298,9 @@ class Parser {
         return assignment();
     }
 
-    private Expr functionExpression() {
+    private Expr.Function functionExpression() {
         consume(LEFT_PAREN, "Expect '(' after function name.");
-        List<Token> parameters = new ArrayList<>();
-        if (!check(RIGHT_PAREN)) {
-            do {
-                if (parameters.size() >= 8) {
-                    error(peek(), "Cannot have more than 8 parameters.");
-                }
-
-                parameters.add(consume(IDENTIFIER, "Expect parameter name."));
-            } while (match(COMMA));
-        }
-        consume(RIGHT_PAREN, "Expect ')' after parameters.");
+        List<Token> parameters = parameters();
 
         consume(LEFT_BRACE, "Expect '{' before function body.");
         List<Stmt> body = block();

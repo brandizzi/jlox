@@ -1,6 +1,7 @@
 package br.com.brandizzi.adam.myjlox;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +73,14 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
             classMethods.put(method.name.lexeme, function);
         }
 
-        LoxClass klass = new LoxClass(stmt.name.lexeme, methods, classMethods);
+        Map<String, LoxGetter> getters = new HashMap<>();
+
+        for (Stmt.Function getter : stmt.getters) {
+            LoxGetter function = new LoxGetter(getter, environment);
+            getters.put(getter.name.lexeme, function);
+        }
+
+        LoxClass klass = new LoxClass(stmt.name.lexeme, methods, classMethods, getters);
         environment.assign(stmt.name, klass);
         return null;
     }
@@ -131,7 +139,12 @@ public class Interpreter implements Stmt.Visitor<Void>, Expr.Visitor<Object> {
     public Object visitGetExpr(Expr.Get expr) {
         Object object = evaluate(expr.object);
         if (object instanceof LoxInstance) {
-            return ((LoxInstance) object).get(expr.name);
+            Object value = ((LoxInstance) object).get(expr.name);
+            if (value instanceof LoxGetter) {
+                return ((LoxGetter) value).call(this, Collections.emptyList());
+            }
+            
+            return value;
         }
 
         throw new RuntimeError(expr.name, "Only instances have properties.");

@@ -59,15 +59,24 @@ abstract class Stmt {
     public Class(
         Token name, List<Function> methods, List<Function> classMethods
     ) {
+        this(name, methods,classMethods, Collections.<Function>emptyList());
+    }
+
+    public Class(
+        Token name, List<Function> methods, List<Function> classMethods,             
+        List<Function> getters
+    ) {
         this.name = name;
         this.methods = methods;
         this.classMethods = classMethods;
+        this.getters = getters;
     }
 
     <R> R accept(Visitor<R> visitor) {
       return visitor.visitClassStmt(this);
     }
 
+    final List<Function> getters;
     final List<Function> classMethods;
     final Token name;
     final List<Stmt.Function> methods;

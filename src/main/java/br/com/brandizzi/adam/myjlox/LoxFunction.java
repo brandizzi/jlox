@@ -3,11 +3,11 @@ package br.com.brandizzi.adam.myjlox;
 import java.util.List;
 
 class LoxFunction implements LoxCallable {
-    private final Environment closure;
-    private List<Token> parameters;
-    private List<Stmt> body;
-    private String name;
-    private final boolean isInitializer;
+    protected final Environment closure;
+    protected List<Token> parameters;
+    protected List<Stmt> body;
+    protected String name;
+    protected final boolean isInitializer;
 
     LoxFunction(Stmt.Function declaration, Environment closure,
                 boolean isInitializer) {
