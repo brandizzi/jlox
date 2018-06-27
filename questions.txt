@@ -40,9 +40,17 @@ http://craftinginterpreters.com/parsing-expressions.html#challenges
 1.
 program     → declaration* EOF ;
 
-declaration → funDecl
+declaration → classDecl
+            | funDecl
             | varDecl
             | statement ;
+
+classDecl   → "class" IDENTIFIER "{" method* "}" ;
+method   → ( "class" )? function
+            | getter ;
+
+
+getter    → IDENTIFIER block ;
 
 funDecl  → "fun" function ;
 function → IDENTIFIER funSpec;
@@ -138,3 +146,9 @@ http://craftinginterpreters.com/resolving-and-binding.html#challenges
 2. JavaScript let you do this with the var keyword, but the let keyword prevents that; TBH both are plausible choices but I understand the choce for let. It does not make sense in Python, since thiere is no variable declaration there. In Java, it is not even possible to declare a var with same name inside an inner block. Surprisingly, in C, it is possible and the inner variable is initialized with itself (and since it is not initialized, it get garbage); I mean, I guess this is it, but would make sense because it would maximize memory corruption, which is a design goal in C.
 
 3. Done! See 01143bd13aa9. (NOt very elegant but working)
+
+http://craftinginterpreters.com/classes.html#challenges
+
+1. See cf82663a1b32.
+
+2. 
