@@ -152,3 +152,5 @@ http://craftinginterpreters.com/classes.html#challenges
 1. See cf82663a1b32.
 
 2. See aa80810f5955.
+
+3. To make everything public makes everything simpler: you need no syntax to hide fields. Also, it can be practical enough and a bit handy in complex situations. To make everything private makes things slightly less simpler to implementer, but it is still simple: you have a syntax for defining fields and then all are private. Giving the choice is a notable complication: you need more syntax and sematnics. But it is more flexible, though.
