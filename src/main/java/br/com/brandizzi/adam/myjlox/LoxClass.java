@@ -8,20 +8,20 @@ class LoxClass extends LoxInstance implements LoxCallable {
     final String name;
     private final Map<String, LoxFunction> methods;
     private final Map<String, LoxGetter> getters;
-
+    private LoxClass superclass;
 
     LoxClass(
-        String name, Map<String, LoxFunction> methods,
-        Map<String, LoxFunction> classMethods,
-        Map<String, LoxGetter> getters
+        String name, LoxClass superclass, Map<String, LoxFunction> methods,
+        Map<String, LoxFunction> classMethods, Map<String, LoxGetter> getters
     ) {
         super(new LoxType(name, classMethods));
+        this.superclass = superclass;
         this.name = name;
         this.methods = methods;
         this.getters = getters;
-        
+
     }
-    
+
     protected LoxClass(String name, Map<String, LoxFunction> classMethods) {
         super(null);
         this.name = name;
@@ -59,7 +59,7 @@ class LoxClass extends LoxInstance implements LoxCallable {
 
         return null;
     }
-    
+
     @Override
     public int arity() {
         LoxFunction initializer = methods.get("init");

@@ -35,7 +35,9 @@ public class GenerateAst {
             Arrays.asList(
                 "Expression : Expr expression", "Print      : Expr expression",
                 "Block      : List<Stmt> statements",
-                "Class      : Token name, List<Stmt.Function> methods",
+                "Class      : Token name, Expr.Variable superclass, "
+                    + "List<Stmt.Function> methods, List<Function> classMethods, "
+                    + "List<Function> getters",
                 "Return	    : Token keyword, Expr value",
                 "Function   : Token name, List<Token> parameters, List<Stmt> body",
                 "Var        : Token name, Expr initializer",

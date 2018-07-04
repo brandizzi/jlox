@@ -76,6 +76,11 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         ClassType enclosingClass = currentClass;
         currentClass = ClassType.CLASS;
         declare(stmt.name);
+
+        if (stmt.superclass != null) {
+            resolve(stmt.superclass);
+        }
+
         define(stmt.name);
 
         for (Stmt.Function method : stmt.classMethods) {

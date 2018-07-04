@@ -87,31 +87,41 @@ class Parser {
 
     private Stmt classDeclaration() {
         Token name = consume(IDENTIFIER, "Expect class name.");
+
+        Expr.Variable superclass = null;
+        if (match(LESS)) {
+            consume(IDENTIFIER, "Expect superclass name.");
+            superclass = new Expr.Variable(previous());
+        }
+
         consume(LEFT_BRACE, "Expect '{' before class body.");
 
         List<Stmt.Function> methods = new ArrayList<>();
         List<Stmt.Function> classMethods = new ArrayList<>();
         List<Stmt.Function> getters = new ArrayList<>();
 
-        
         while (!check(RIGHT_BRACE) && !isAtEnd()) {
             if (match(CLASS)) {
                 classMethods.add(function("class method"));
             } else {
-                Token methodName = consume(IDENTIFIER, "Expect method or getter name.");
-                
+                Token methodName =
+                    consume(IDENTIFIER, "Expect method or getter name.");
+
                 if (check(TokenType.LEFT_PAREN)) {
                     consume(LEFT_PAREN, "Expect '(' after function name.");
                     List<Token> parameters = parameters();
-                    
+
                     consume(LEFT_BRACE, "Expect '{' before function body.");
                     List<Stmt> body = block();
-                    Function method = new Stmt.Function(methodName, parameters, body);
+                    Function method =
+                        new Stmt.Function(methodName, parameters, body);
                     methods.add(method);
                 } else {
                     consume(LEFT_BRACE, "Expect '{' before function body.");
                     List<Stmt> body = block();
-                    Function getter = new Stmt.Function(methodName, Collections.<Token>emptyList(), body);
+                    Function getter = new Stmt.Function(
+                        methodName, Collections.<Token>emptyList(), body
+                    );
                     getters.add(getter);
                 }
             }
@@ -119,9 +129,8 @@ class Parser {
 
         consume(RIGHT_BRACE, "Expect '}' after class body.");
 
-        return new Stmt.Class(name, methods, classMethods, getters);
+        return new Stmt.Class(name, superclass, methods, classMethods, getters);
     }
-
 
     private void rewind() {
         current--;
