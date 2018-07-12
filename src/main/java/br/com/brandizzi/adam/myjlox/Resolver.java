@@ -63,7 +63,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
     private void endScope() {
         List<Token> count = useCheck.pop();
         for (Token token : count) {
-            if (token.type != TokenType.THIS)
+            if (token.type != TokenType.THIS && token.type != TokenType.SUPER)
                 Lox.error(token, "Local variable never used.");
         }
         indicesMaps.pop();
@@ -83,6 +83,13 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
         define(stmt.name);
 
+        if (stmt.superclass != null) {
+            beginScope();
+            Token sup = new Token(TokenType.SUPER, "super", "super", 0);
+
+            declare(sup);
+        }
+        
         for (Stmt.Function method : stmt.classMethods) {
             FunctionType declaration = FunctionType.METHOD;
             if (method.name.lexeme.equals("init")) {
@@ -110,11 +117,21 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         }
 
         endScope();
+
+        if (stmt.superclass != null)
+            endScope();
+
         currentClass = enclosingClass;
 
         return null;
     }
 
+    @Override
+    public Void visitSuperExpr(Expr.Super expr) {
+      resolveLocal(expr, expr.keyword);
+      return null;
+    }
+    
     @Override
     public Void visitVarStmt(Stmt.Var stmt) {
         declare(stmt.name);

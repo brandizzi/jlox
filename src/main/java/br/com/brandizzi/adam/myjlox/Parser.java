@@ -34,6 +34,7 @@ import static br.com.brandizzi.adam.myjlox.TokenType.SEMICOLON;
 import static br.com.brandizzi.adam.myjlox.TokenType.SLASH;
 import static br.com.brandizzi.adam.myjlox.TokenType.STAR;
 import static br.com.brandizzi.adam.myjlox.TokenType.STRING;
+import static br.com.brandizzi.adam.myjlox.TokenType.SUPER;
 import static br.com.brandizzi.adam.myjlox.TokenType.THIS;
 import static br.com.brandizzi.adam.myjlox.TokenType.TRUE;
 import static br.com.brandizzi.adam.myjlox.TokenType.VAR;
@@ -530,6 +531,14 @@ class Parser {
 
         if (match(NUMBER, STRING)) {
             return new Expr.Literal(previous().literal);
+        }
+
+        if (match(SUPER)) {
+            Token keyword = previous();
+            consume(DOT, "Expect '.' after 'super'.");
+            Token method =
+                consume(IDENTIFIER, "Expect superclass method name.");
+            return new Expr.Super(keyword, method);
         }
 
         if (match(THIS))
