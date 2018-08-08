@@ -123,7 +123,7 @@ http://craftinginterpreters.com/statements-and-state.html#challenges
 http://craftinginterpreters.com/control-flow.html#challenges
 1. It is possible to implement conditional execution this way: you have two functions, both receiving two orther functions as parameters each. One function executes its fist parameter; the other executes the second parameter. So once I want to execute one of both conditions, I give the two functions the same arguments. This is how SmallTalk does it, and the functions are the boolean values in smalltalk. Nifty!
 
-2. We can create a loop by executing a function through a recursive function. This is quite straightfoward, indeed. This is very common (at least in principle) for Lisps and other FP languages. To be efficient, though, we may need tail recursion and to be effective, tail recursion may require a specific call format.
+2. We can create a loop by executing a function through a recursive function. This is quite straightfowrard, indeed. This is very common (at least in principle) for Lisps and other FP languages. To be efficient, though, we may need tail recursion and to be effective, tail recursion may require a specific call format.
 
 3.  See:
 cf281bb395a6 break: interpreter interrupts execution; visit to break sets flat to interrupt.
@@ -160,4 +160,4 @@ http://craftinginterpreters.com/inheritance.html#challenges
 1. I find multiple inheritance quite complicated, maybe not worth it. If I would use something like that, I'd probably choose something like mixins or traits, since they are simpler. Maybe extension methods, they sound straightforward, but are limited too.
 Also, I feel courageous but multiple inheritance sucks so I will not implement it ;)
 
-Oh, crap, I cannot ignore a challenge :(
+Oh, crap, I cannot ignore a challenge :( See 506465d5f705. Not complete but enough to scratch my challenge itch. 
