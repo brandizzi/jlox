@@ -45,7 +45,7 @@ declaration → classDecl
             | varDecl
             | statement ;
 
-classDecl   → "class" IDENTIFIER ( "<" IDENTIFIER )? "{" method* "}" ;
+classDecl   → "class" IDENTIFIER ( "<" IDENTIFIER ( "," IDENTIFIER )* )? "{" method* "}" ;
 method   → ( "class" )? function
             | getter ;
 
@@ -155,3 +155,9 @@ http://craftinginterpreters.com/classes.html#challenges
 2. See aa80810f5955.
 
 3. To make everything public makes everything simpler: you need no syntax to hide fields. Also, it can be practical enough and a bit handy in complex situations. To make everything private makes things slightly less simpler to implementer, but it is still simple: you have a syntax for defining fields and then all are private. Giving the choice is a notable complication: you need more syntax and sematnics. But it is more flexible, though.
+
+http://craftinginterpreters.com/inheritance.html#challenges
+1. I find multiple inheritance quite complicated, maybe not worth it. If I would use something like that, I'd probably choose something like mixins or traits, since they are simpler. Maybe extension methods, they sound straightforward, but are limited too.
+Also, I feel courageous but multiple inheritance sucks so I will not implement it ;)
+
+Oh, crap, I cannot ignore a challenge :(
