@@ -8,6 +8,7 @@ import java.util.Stack;
 
 import br.com.brandizzi.adam.myjlox.Expr.Function;
 import br.com.brandizzi.adam.myjlox.Expr.Ternary;
+import br.com.brandizzi.adam.myjlox.Expr.Variable;
 import br.com.brandizzi.adam.myjlox.Stmt.Break;
 
 class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
@@ -77,14 +78,16 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
         currentClass = ClassType.CLASS;
         declare(stmt.name);
 
-        if (stmt.superclass != null) {
+        if (!stmt.superclasses.isEmpty()) {
             currentClass = ClassType.SUBCLASS;
-            resolve(stmt.superclass);
+            for (Variable superclass : stmt.superclasses) {
+                resolve(superclass);
+            }
         }
 
         define(stmt.name);
 
-        if (stmt.superclass != null) {
+        if (!stmt.superclasses.isEmpty()) {
             beginScope();
             Token sup = new Token(TokenType.SUPER, "super", "super", 0);
 
@@ -119,7 +122,7 @@ class Resolver implements Expr.Visitor<Void>, Stmt.Visitor<Void> {
 
         endScope();
 
-        if (stmt.superclass != null)
+        if (!stmt.superclasses.isEmpty())
             endScope();
 
         currentClass = enclosingClass;

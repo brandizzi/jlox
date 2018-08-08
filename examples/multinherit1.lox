@@ -1,0 +1,28 @@
+class A {
+    setIt() {
+        this.i = "a";
+    }
+}
+
+class B {
+    setIt() {
+        this.i = "b";
+    }
+}
+
+class AB < A, B {
+}
+
+var ab = AB();
+
+ab.setIt();
+print ab.i; // a
+
+class BA < B, A {
+}
+
+var ba = BA();
+
+ba.setIt();
+print ba.i; // b
+
