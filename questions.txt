@@ -161,3 +161,5 @@ http://craftinginterpreters.com/inheritance.html#challenges
 Also, I feel courageous but multiple inheritance sucks so I will not implement it ;)
 
 Oh, crap, I cannot ignore a challenge :( See 506465d5f705. Not complete but enough to scratch my challenge itch. 
+2. I will not do this one.
+3. I will not do this one.
